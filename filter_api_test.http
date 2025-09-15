@@ -1,0 +1,16 @@
+﻿@filter_api_test_HostAddress = https://localhost:7200
+
+GET {{filter_api_test_HostAddress}}/filteritems/page={sourceId}
+
+###
+
+POST {{filter_api_test_HostAddress}}/filteritems
+Content-Type: application/json
+
+{
+  "userId":1,
+  "sourceId":"1",
+  "fieldName":"category",
+  "data":"{id: ["C-1", "C-2"]}"
+}
+###
