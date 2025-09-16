@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using filter_api_test;
+using filter_api_test.Data;
 
 #nullable disable
 
 namespace filter_api_test.Migrations
 {
     [DbContext(typeof(FilterDb))]
-    [Migration("20250910122425_CreatedFilterCompositionModel")]
-    partial class CreatedFilterCompositionModel
+    [Migration("20250916133454_StoredFilterToUTC")]
+    partial class StoredFilterToUTC
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,10 +61,10 @@ namespace filter_api_test.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StoredFilters");
+                    b.ToTable("StoredFilter");
                 });
 
-            modelBuilder.Entity("filter_api_test.Filter", b =>
+            modelBuilder.Entity("filter_api_test.Models.Filter", b =>
                 {
                     b.Property<string>("SourceId")
                         .HasColumnType("nvarchar(450)");
@@ -88,10 +88,10 @@ namespace filter_api_test.Migrations
 
                     b.HasAlternateKey("Id");
 
-                    b.ToTable("Filters");
+                    b.ToTable("Filter");
                 });
 
-            modelBuilder.Entity("filter_api_test.FilterComposition", b =>
+            modelBuilder.Entity("filter_api_test.Models.FilterComposition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,7 +124,7 @@ namespace filter_api_test.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FilterCompositions");
+                    b.ToTable("FilterComposition");
                 });
 #pragma warning restore 612, 618
         }

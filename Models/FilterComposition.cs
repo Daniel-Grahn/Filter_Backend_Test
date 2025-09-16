@@ -1,4 +1,4 @@
-﻿namespace filter_api_test
+﻿namespace filter_api_test.Models
 {
     public class FilterComposition
     {
@@ -7,8 +7,8 @@
         public int CompanyId { get; set; }
         public int? UserId { get; set; }
         public required string SourceId { get; set; }
-        public required DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; } 
+        public required DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         public string[]? FieldNames { get; set; }
     }
 }

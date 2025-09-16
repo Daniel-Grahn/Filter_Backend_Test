@@ -1,17 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace filter_api_test.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Filters",
+                name: "Filter",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
@@ -23,12 +24,31 @@ namespace filter_api_test.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Filters", x => new { x.SourceId, x.UserId, x.FieldName });
-                    table.UniqueConstraint("AK_Filters_Id", x => x.Id);
+                    table.PrimaryKey("PK_Filter", x => new { x.SourceId, x.UserId, x.FieldName });
+                    table.UniqueConstraint("AK_Filter_Id", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StoredFilters",
+                name: "FilterComposition",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    SourceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FieldNames = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilterComposition", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StoredFilter",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -38,11 +58,13 @@ namespace filter_api_test.Migrations
                     UserId = table.Column<int>(type: "int", nullable: true),
                     IsPersonal = table.Column<bool>(type: "bit", nullable: false),
                     SourceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Filters = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StoredFilters", x => x.Id);
+                    table.PrimaryKey("PK_StoredFilter", x => x.Id);
                 });
         }
 
@@ -50,10 +72,13 @@ namespace filter_api_test.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Filters");
+                name: "Filter");
 
             migrationBuilder.DropTable(
-                name: "StoredFilters");
+                name: "FilterComposition");
+
+            migrationBuilder.DropTable(
+                name: "StoredFilter");
         }
     }
 }

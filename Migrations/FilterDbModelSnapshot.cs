@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using filter_api_test;
+using filter_api_test.Data;
 
 #nullable disable
 
@@ -61,7 +61,7 @@ namespace filter_api_test.Migrations
                     b.ToTable("StoredFilter");
                 });
 
-            modelBuilder.Entity("filter_api_test.Filter", b =>
+            modelBuilder.Entity("filter_api_test.Models.Filter", b =>
                 {
                     b.Property<string>("SourceId")
                         .HasColumnType("nvarchar(450)");
@@ -88,7 +88,7 @@ namespace filter_api_test.Migrations
                     b.ToTable("Filter");
                 });
 
-            modelBuilder.Entity("filter_api_test.FilterComposition", b =>
+            modelBuilder.Entity("filter_api_test.Models.FilterComposition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using filter_api_test;
+using filter_api_test.Data;
 
 #nullable disable
 
 namespace filter_api_test.Migrations
 {
     [DbContext(typeof(FilterDb))]
-    [Migration("20250910123131_RenamedModels")]
-    partial class RenamedModels
+    [Migration("20250916120835_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,7 +64,7 @@ namespace filter_api_test.Migrations
                     b.ToTable("StoredFilter");
                 });
 
-            modelBuilder.Entity("filter_api_test.Filter", b =>
+            modelBuilder.Entity("filter_api_test.Models.Filter", b =>
                 {
                     b.Property<string>("SourceId")
                         .HasColumnType("nvarchar(450)");
@@ -91,7 +91,7 @@ namespace filter_api_test.Migrations
                     b.ToTable("Filter");
                 });
 
-            modelBuilder.Entity("filter_api_test.FilterComposition", b =>
+            modelBuilder.Entity("filter_api_test.Models.FilterComposition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
