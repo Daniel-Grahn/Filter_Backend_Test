@@ -41,9 +41,11 @@ name: .NET Core Desktop Test
 #When should this workflow be triggerd (when someone use a push or pull_request to the main branch)
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
+  
+    
 
 #What should the job (workflow) do?
 #OBS! Could be multipule jobs
@@ -57,7 +59,6 @@ jobs:
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-
     env:
       Solution_Name: filter_api_test.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: WeDontHaveOneYet                # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
