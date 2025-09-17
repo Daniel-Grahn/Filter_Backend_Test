@@ -12,8 +12,10 @@ namespace filter_api_test.Repositories
         public FilterRepository(FilterDb db) => _db = db;
 
         // Filter methods
-        public async Task<Filter?> GetFilterAsync(string sourceId, int userId, string fieldName) =>
-            await _db.Filter.FindAsync(sourceId, userId, fieldName);
+        public async Task<Filter[]> GetFiltersAsync(string sourceId, int userId) => await _db.Filter.Where(f => f.SourceId == sourceId && f.UserId == userId).ToArrayAsync();
+
+        public async Task<Filter> GetFilterByFieldNameAsync(string sourceId, int userId, string fieldName) =>
+            await _db.Filter.FindAsync(sourceId, userId, fieldName) ?? throw new ArgumentException("Wrong");
 
         public async Task AddFilterAsync(Filter filter)
         {

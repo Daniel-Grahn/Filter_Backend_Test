@@ -12,6 +12,12 @@ namespace filter_api_test.Endpoints
         {
             var filterGroup = app.MapGroup("/filteritems");
 
+            filterGroup.MapGet("/page/{sourceId}/user/{userId}", async (string sourceId, int userId, IFilterService service) =>
+            {
+                var results = await service.GetFiltersAsync(sourceId, userId);
+                return results.Length > 0 ? Results.Ok(results) : Results.NotFound();
+            });
+
             //FilterRequestDTO
             filterGroup.MapPut("/", async (FilterRequestDTO filter, IFilterService service) =>
             {

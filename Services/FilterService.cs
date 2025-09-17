@@ -17,11 +17,12 @@ namespace filter_api_test.Services
             _mapper = mapper;
         }
 
+        public Task<Filter[]> GetFiltersAsync(string sourceId, int userId) => _repo.GetFiltersAsync(sourceId, userId);
         public async Task<Filter> AddOrUpdateFilterAsync(FilterRequestDTO requestFilter)
         {
             //mapp requets to filter
             var inputFilter = _mapper.Map<Filter>(requestFilter);
-            var existing = await _repo.GetFilterAsync(inputFilter.SourceId, inputFilter.UserId, inputFilter.FieldName);
+            var existing = await _repo.GetFilterByFieldNameAsync(inputFilter.SourceId, inputFilter.UserId, inputFilter.FieldName);
             if (existing == null)
             {
                 await _repo.AddFilterAsync(inputFilter);
@@ -52,6 +53,5 @@ namespace filter_api_test.Services
 
         }
         public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
-
     }
 }

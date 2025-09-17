@@ -5,7 +5,9 @@ namespace filter_api_test.Repository
     public interface IFilterRepository
     {
         // Filter
-        Task<Filter?> GetFilterAsync(string sourceId, int userId, string fieldName);
+        Task<Filter[]> GetFiltersAsync(string sourceId, int userId);
+        Task<Filter> GetFilterByFieldNameAsync(string sourceId, int userId, string fieldName);
+
         Task AddFilterAsync(Filter filter);
         Task UpdateFilterAsync(Filter filter);
 
