@@ -17,8 +17,6 @@ namespace filter_api_test.Services
             _mapper = mapper;
         }
 
-        public Task<Filter[]> GetFiltersAsync(string sourceId) => _repo.GetFiltersBySourceAsync(sourceId);
-
         public async Task<Filter> AddOrUpdateFilterAsync(FilterRequestDTO requestFilter)
         {
             //mapp requets to filter
