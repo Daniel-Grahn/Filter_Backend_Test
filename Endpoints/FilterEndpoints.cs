@@ -44,6 +44,8 @@ namespace filter_api_test.Endpoints
                 return results.Length > 0 ? Results.Ok(results) : Results.NotFound();
             });
         }
+
+        
     }
 }
 
