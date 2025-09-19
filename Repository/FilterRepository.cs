@@ -1,10 +1,10 @@
-﻿using filter_api_test.Data;
-using filter_api_test.DTOs;
-using filter_api_test.Models;
-using filter_api_test.Repository;
+﻿using FilterAPI.Data;
+using FilterAPI.DTOs;
+using FilterAPI.Models;
+using FilterAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace filter_api_test.Repositories
+namespace FilterAPI.Repositories
 {
     public class FilterRepository : IFilterRepository
     {

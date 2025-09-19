@@ -1,4 +1,4 @@
-﻿namespace filter_api_test.Models
+﻿namespace FilterAPI.Models
 {
     public class FilterComposition
     {

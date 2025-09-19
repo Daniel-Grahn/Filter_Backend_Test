@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using filter_api_test.Models;
+using FilterAPI.Models;
 
-namespace filter_api_test.Data
+namespace FilterAPI.Data
 {
     public class FilterDb : DbContext
     {

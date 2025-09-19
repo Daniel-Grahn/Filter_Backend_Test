@@ -1,6 +1,6 @@
-﻿using filter_api_test.Models;
+﻿using FilterAPI.Models;
 
-namespace filter_api_test.Repository
+namespace FilterAPI.Repository
 {
     public interface IFilterRepository
     {

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using filter_api_test.DTOs;
-using filter_api_test.Models;
-using filter_api_test.Repository;
+using FilterAPI.DTOs;
+using FilterAPI.Models;
+using FilterAPI.Repository;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace filter_api_test.Services
+namespace FilterAPI.Services
 {
     public class FilterService : IFilterService
 

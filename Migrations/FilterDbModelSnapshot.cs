@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using filter_api_test.Data;
+using FilterAPI.Data;
 
 #nullable disable
 
-namespace filter_api_test.Migrations
+namespace FilterAPI.Migrations
 {
     [DbContext(typeof(FilterDb))]
     partial class FilterDbModelSnapshot : ModelSnapshot

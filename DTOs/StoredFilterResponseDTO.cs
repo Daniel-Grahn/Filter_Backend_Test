@@ -1,4 +1,4 @@
-﻿namespace filter_api_test.DTOs
+﻿namespace FilterAPI.DTOs
 {
     public record StoredFilterResponseDTO
     (

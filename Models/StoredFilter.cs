@@ -1,5 +1,5 @@
-﻿using filter_api_test;
-using filter_api_test.DTOs;
+﻿using FilterAPI;
+using FilterAPI.DTOs;
 
 public class StoredFilter
 {

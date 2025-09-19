@@ -1,10 +1,10 @@
-﻿using filter_api_test.DTOs;
-using filter_api_test.Models;
-using filter_api_test.Services;
+﻿using FilterAPI.DTOs;
+using FilterAPI.Models;
+using FilterAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace filter_api_test.Endpoints
+namespace FilterAPI.Endpoints
 {
     public static class FilterEndpoints
     {

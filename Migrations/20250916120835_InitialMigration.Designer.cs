@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using filter_api_test.Data;
+using FilterAPI.Data;
 
 #nullable disable
 
-namespace filter_api_test.Migrations
+namespace FilterAPI.Migrations
 {
     [DbContext(typeof(FilterDb))]
     [Migration("20250916120835_InitialMigration")]

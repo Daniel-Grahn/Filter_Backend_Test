@@ -1,7 +1,7 @@
-﻿using filter_api_test.DTOs;
-using filter_api_test.Models;
+﻿using FilterAPI.DTOs;
+using FilterAPI.Models;
 
-namespace filter_api_test.Services
+namespace FilterAPI.Services
 {
     public interface IFilterService
     {

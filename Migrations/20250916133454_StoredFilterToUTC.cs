@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace filter_api_test.Migrations
+namespace FilterAPI.Migrations
 {
     /// <inheritdoc />
     public partial class StoredFilterToUTC : Migration
