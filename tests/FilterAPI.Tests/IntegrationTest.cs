@@ -21,20 +21,88 @@ namespace FilterApi.Test
                 .Options;
             return new FilterDb(options);
         }
+
+
+
         //Filter
         [Fact]
-        public async Task GetFilterAsyncTest()
+        public async Task GetFiltersAsync()
         {
             var db = GetInMemoryDb();
             var repo = new FilterRepository(db);
-            var filter = new Filter { SourceId = "S1", UserId = 1, FieldName = "Field1" };
-            //await Assert.ThrowsAsync<ArgumentException>(async () => await repo.GetFilterByFieldNameAsync("S1", 1, "Field1"));
+            Filter[] filters = [new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" },
+                                new Filter { SourceId = "p1", UserId = 1, FieldName = "status" },
+                                new Filter { SourceId = "p2", UserId = 1, FieldName = "catagory" }];
+
+            Filter[] findfilters = await repo.GetFiltersAsync("p1", 1);
+            Assert.Empty(findfilters);
+
+            foreach (Filter filter in filters) { 
+                await repo.AddFilterAsync(filter);
+            }
+
+            Filter[] foundfilter = await repo.GetFiltersAsync("p1", 1);
+            Assert.NotEmpty(foundfilter);
+            Assert.Equal(2, foundfilter.Length);
+        }
+
+
+
+
+        [Fact]
+        public async Task GetFilterByFieldNameAsync()
+        {
+            var db = GetInMemoryDb();
+            var repo = new FilterRepository(db);
+            var filter = new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" };
+            //await Assert.ThrowsAsync<ArgumentException>(async () => await repo.GetFilterByFieldNameAsync("p1", 1, "catagory"));
             //Here we add the filter
             await repo.AddFilterAsync(filter);
-            var foundFilter = await repo.GetFilterByFieldNameAsync("S1", 1, "Field1");
+            var foundFilter = await repo.GetFilterByFieldNameAsync("p1", 1, "catagory");
             Assert.NotNull(foundFilter);
             Assert.Equal(filter, foundFilter);
         }
+
+        [Fact]
+        public async Task AddFilterAsync()
+        {
+            var db = GetInMemoryDb();
+            var repo = new FilterRepository(db);
+            var filter = new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" };
+
+            //Here we look if the list is empty
+            var noFilters = await repo.GetFiltersAsync("p1", 1);
+            Assert.Empty(noFilters);
+
+
+
+            //Here we add the filter the first time
+            await repo.AddFilterAsync(filter);
+            var oneFilter = await repo.GetFiltersAsync("p1", 1);
+            Assert.NotNull(oneFilter);
+            Assert.Single(oneFilter);
+
+
+
+            //Here we add a new filter
+            var aSecondFilter = new Filter { SourceId = "p1", UserId = 1, FieldName = "status" };
+            await repo.AddFilterAsync(aSecondFilter);
+            var filters = await repo.GetFiltersAsync("p1", 1);
+            Assert.NotNull(filters);
+            Assert.Equal(2, filters.Length);
+
+
+            //Here we add the filter a second time
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await repo.AddFilterAsync(filter);
+            });
+            var justFilter = await repo.GetFiltersAsync("p1", 1);
+            Assert.Equal(2, justFilter.Length);
+        }
+
+
+
         [Fact]
         public async Task UpdateFilterAsyncTest()
         {
@@ -53,6 +121,9 @@ namespace FilterApi.Test
             Assert.NotNull(updatedfoundFilter.Data);
             Assert.Equal(["C-1", "C-2"], updatedfoundFilter.Data);
         }
+
+
+
         // StoredFilter
         [Fact]
         public async Task GetStoredFiltersAsyncTest() // Not Done yet (Remeber: it is a list, check for more possible outcomes)
@@ -144,7 +215,7 @@ namespace FilterApi.Test
             Assert.Equal("YourFilter", storedfilter.Title);
         }
 
-        // FilterComposition methods
+        // FilterComposition
         [Fact]
         public async Task GetFilterCompositionsAsync()
         {
@@ -155,7 +226,7 @@ namespace FilterApi.Test
 
             Assert.Empty(filterCompositionList);
 
-
+            //There is no way to test this properly
         }
 
     }
