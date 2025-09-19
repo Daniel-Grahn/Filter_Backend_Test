@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System.ComponentModel.Design;
 namespace FilterApi.Test
 {
     public class FilterRepositoryTest
@@ -141,9 +142,18 @@ namespace FilterApi.Test
             await repo.UpdateStoredFilterAsync(storedfilter);
 
             Assert.Equal("YourFilter", storedfilter.Title);
+        }
 
+        // FilterComposition methods
+        [Fact]
+        public async Task GetFilterCompositionsAsync()
+        {
+            var db = GetInMemoryDb();
+            var repo = new FilterRepository(db);
 
+            FilterComposition[] filterCompositionList = await repo.GetFilterCompositionsAsync(22, "1");
 
+            Assert.Empty(filterCompositionList);
 
 
         }
