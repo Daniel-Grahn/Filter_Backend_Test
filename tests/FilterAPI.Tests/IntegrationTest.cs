@@ -4,6 +4,10 @@ using FilterAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using FilterAPI.Repositories;
 using FilterAPI.Models;
+using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilterApi.Test
 {
     public class FilterRepositoryTest
@@ -103,6 +107,43 @@ namespace FilterApi.Test
 
             //Find a StoredFilter that dose not excist
             Assert.Null(await repo.GetStoredFilterAsync(78));
+
+
+        }
+
+        [Fact]
+        public async Task UpdateStoredFilterAsync()
+        {
+            var db = GetInMemoryDb();
+            var repo = new FilterRepository(db);
+
+
+            int storedFilterId = 1;
+            StoredFilter newStoredFilter = new StoredFilter
+            {
+                Id = storedFilterId,
+                Title = "myFilter",
+                CompanyId = 22,
+                UserId = 1,
+                IsPersonal = true,
+                SourceId = "1",
+                CreatedAt = DateTime.Now,
+            };
+            await repo.AddStoredFilterAsync(newStoredFilter);
+
+            //Before being uppdated
+            StoredFilter storedfilter = await repo.GetStoredFilterAsync(storedFilterId);
+            Assert.NotNull(storedfilter);
+            Assert.Equal("myFilter", storedfilter.Title);
+
+            //After being updated
+            storedfilter.Title = "YourFilter";
+            await repo.UpdateStoredFilterAsync(storedfilter);
+
+            Assert.Equal("YourFilter", storedfilter.Title);
+
+
+
 
 
         }
