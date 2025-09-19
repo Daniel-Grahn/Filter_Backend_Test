@@ -50,7 +50,7 @@ namespace FilterApi.Test
         }
         // StoredFilter
         [Fact]
-        public async Task GetStoredFiltersAsyncTest()
+        public async Task GetStoredFiltersAsyncTest() // Not Done yet (Remeber: it is a list, check for more possible outcomes)
         {
             var db = GetInMemoryDb();
             var repo = new FilterRepository(db);
@@ -71,5 +71,41 @@ namespace FilterApi.Test
             Assert.Single(storedFilters);
             Assert.Equal("myFilter", storedFilters[0].Title);
         }
+
+        [Fact]
+        public async Task GetStoredFilterAsync() { 
+            var db = GetInMemoryDb();
+            var repo = new FilterRepository(db);
+
+
+            int storedFilterId = 1;
+            StoredFilter newStoredFilter = new StoredFilter
+            {
+                Id = storedFilterId,
+                Title = "myFilter",
+                CompanyId = 22,
+                UserId = 1,
+                IsPersonal = true,
+                SourceId = "1",
+                CreatedAt = DateTime.Now,
+            };
+
+            //Before being added
+            Assert.Null(await repo.GetStoredFilterAsync(storedFilterId));
+
+
+            await repo.AddStoredFilterAsync(newStoredFilter);
+
+            //Find the StoredFilter after being added
+            StoredFilter foundStoredFilter = await repo.GetStoredFilterAsync(storedFilterId);
+            Assert.Equal(newStoredFilter, foundStoredFilter);
+
+
+            //Find a StoredFilter that dose not excist
+            Assert.Null(await repo.GetStoredFilterAsync(78));
+
+
+        }
+
     }
 }
