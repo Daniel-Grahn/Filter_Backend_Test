@@ -6,8 +6,21 @@ on:
 
 jobs:
   test:
-    name: Run Tests
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD: ${{ secrets.TESTACTION_PASSWORD }}
+          ACCEPT_EULA: "Y"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "exit 0"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Checkout code
@@ -16,14 +29,30 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: | 
+        dotnet-version: |
           8.x
-          
+
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build
       run: dotnet build --no-restore --configuration Release
 
+    # Wait for SQL Server to be ready
+    - name: Wait for SQL Server
+      run: |
+        echo "Waiting 20s for SQL Server to start..."
+        sleep 20
+
+    # Drop and recreate test database
+    - name: Create clean test database
+      run: |
+        password="${{ secrets.TESTACTION_PASSWORD }}"
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $password -Q "IF DB_ID('FiltersDbTest') IS NOT NULL DROP DATABASE FiltersDbTest; CREATE DATABASE FiltersDbTest;"
+
+    # Run tests with connection string from secrets
     - name: Run tests
       run: dotnet test --no-build --configuration Release --verbosity normal
+      env:
+        ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=FiltersDbTest;User Id=sa;Password=${{ secrets.TESTACTION_PASSWORD }};TrustServerCertificate=true;"
+
