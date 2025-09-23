@@ -8,11 +8,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # SQL Server container service
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          SA_PASSWORD: ${{ secrets.TESTACTION_PASSWORD }}
+          SA_PASSWORD: ${{ secrets.TESTACTION_PASSWORD }}  # Secret
           ACCEPT_EULA: "Y"
         ports:
           - 1433:1433
@@ -29,8 +30,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: |
-          8.x
+        dotnet-version: 8.x
 
     - name: Restore dependencies
       run: dotnet restore
@@ -38,7 +38,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
 
-    # Install SQL Server command-line tools (sqlcmd)
+    # Install sqlcmd on Ubuntu
     - name: Install SQLCMD
       run: |
         sudo apt-get update
@@ -47,7 +47,8 @@ jobs:
         curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
         sudo apt-get update
         sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools unixodbc-dev
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
+        # Add sqlcmd to PATH for all following steps
+        echo "PATH=$PATH:/opt/mssql-tools/bin" >> $GITHUB_ENV
 
     # Wait for SQL Server to be ready
     - name: Wait for SQL Server
