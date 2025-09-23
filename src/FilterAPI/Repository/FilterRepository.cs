@@ -1,5 +1,4 @@
 ﻿using FilterAPI.Data;
-using FilterAPI.DTOs;
 using FilterAPI.Models;
 using FilterAPI.Repository;
 using Microsoft.EntityFrameworkCore;

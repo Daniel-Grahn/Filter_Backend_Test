@@ -10,5 +10,11 @@ namespace FilterAPI.Services
         Task<StoredFilter[]> GetStoredFiltersAsync();
         Task<IResult> AddOrUpdateStoredFilterAsync(int id, StoredFilterRequestDTO sf);
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
+
+
+        //--------------Clear Field (return a empty array)------------------
+        Task<Filter[]> ClearDataInFilters(string sourceId, int userId);
+
+
     }
 }

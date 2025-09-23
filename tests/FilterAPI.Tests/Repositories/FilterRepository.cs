@@ -4,7 +4,7 @@ using FilterAPI.Data;
 using FilterAPI.Repositories;
 using FilterAPI.Models;
 
-namespace FilterApi.Test
+namespace FilterAPI.Integration.Tests.Repositories
 {
     public class FilterRepositoryTest
     {
@@ -12,12 +12,24 @@ namespace FilterApi.Test
         private static FilterDb GetInMemoryDb()
         {
             var options = new DbContextOptionsBuilder<FilterDb>()
-                .UseInMemoryDatabase(databaseName: "TestDb_" + System.Guid.NewGuid())
+                .UseInMemoryDatabase(databaseName: "TestDb_" + Guid.NewGuid())
                 .Options;
             return new FilterDb(options);
         }
 
+        //private static FilterDb GetTestDb()
+        //{
+        //    var connectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION")
+        //        ?? "Server=localhost,1433;Database=FiltersDbTest;User Id=sa;Password=BuildingGroupGiraffe9182;TrustServerCertificate=true;";
 
+        //    var options = new DbContextOptionsBuilder<FilterDb>()
+        //        .UseSqlServer(connectionString)
+        //        .Options;
+
+        //    var context = new FilterDb(options);
+        //    context.Database.EnsureCreated(); // creates tables if missing
+        //    return context;
+        //}
 
         //Filter
         [Fact]
@@ -28,14 +40,15 @@ namespace FilterApi.Test
             Filter[] filters = [new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" },
                                 new Filter { SourceId = "p1", UserId = 1, FieldName = "status" },
                                 new Filter { SourceId = "p2", UserId = 1, FieldName = "catagory" }];
-           
+
             //When Filters is empty
             Filter[] findfilters = await repo.GetFiltersAsync("p1", 1);
             Assert.Empty(findfilters);
 
 
             //When Filters has items
-            foreach (Filter filter in filters) { 
+            foreach (Filter filter in filters)
+            {
                 await repo.AddFilterAsync(filter);
             }
 
@@ -45,7 +58,7 @@ namespace FilterApi.Test
 
 
             Filter[] noFilters = await repo.GetFiltersAsync("p1", 0);
-            Assert.Empty(noFilters);    
+            Assert.Empty(noFilters);
 
         }
 
@@ -61,8 +74,8 @@ namespace FilterApi.Test
 
             //There is no filter to get
             Filter noFilter = await repo.GetFilterByFieldNameAsync("p1", 1, "catagory");
-            Assert.Null(noFilter);   
-          
+            Assert.Null(noFilter);
+
             //Here we add the filter
             await repo.AddFilterAsync(filter);
             var foundFilter = await repo.GetFilterByFieldNameAsync("p1", 1, "catagory");
@@ -135,7 +148,7 @@ namespace FilterApi.Test
 
         // StoredFilter
         [Fact]
-        public async Task GetStoredFiltersAsyncTest() 
+        public async Task GetStoredFiltersAsyncTest()
         {
             var db = GetInMemoryDb();
             var repo = new FilterRepository(db);
@@ -144,7 +157,7 @@ namespace FilterApi.Test
 
 
             // add a storde filter
-            StoredFilter newStoredFilter = new ()
+            StoredFilter newStoredFilter = new()
             {
                 Id = 1,
                 Title = "myFilter",
@@ -156,7 +169,7 @@ namespace FilterApi.Test
             };
             await repo.AddStoredFilterAsync(newStoredFilter);
             storedFilters = await repo.GetStoredFiltersAsync();
-            
+
             Assert.Single(storedFilters);
             Assert.Equal("myFilter", storedFilters[0].Title);
 
@@ -179,7 +192,8 @@ namespace FilterApi.Test
         }
 
         [Fact]
-        public async Task GetStoredFilterAsync() { 
+        public async Task GetStoredFilterAsync()
+        {
             var db = GetInMemoryDb();
             var repo = new FilterRepository(db);
 
@@ -196,7 +210,7 @@ namespace FilterApi.Test
                 CreatedAt = DateTime.Now,
             };
             Assert.Null(await repo.GetStoredFilterAsync(storedFilterId));
-            
+
             //Find the StoredFilter after being added
             await repo.AddStoredFilterAsync(newStoredFilter);
             StoredFilter? foundStoredFilter = await repo.GetStoredFilterAsync(storedFilterId);
@@ -270,7 +284,7 @@ namespace FilterApi.Test
 
             //add a storedFilter
             int storedFilterId = 1;
-            StoredFilter newStoredFilter = new ()
+            StoredFilter newStoredFilter = new()
             {
                 Id = storedFilterId,
                 Title = "myFilter",
