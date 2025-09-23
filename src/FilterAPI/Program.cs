@@ -1,5 +1,3 @@
-using AutoMapper;
-using FilterAPI;
 using FilterAPI.Data;
 using FilterAPI.DTOs;
 using FilterAPI.Endpoints;
@@ -8,8 +6,6 @@ using FilterAPI.Repositories;
 using FilterAPI.Repository;
 using FilterAPI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +51,6 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<FilterDb>();
     dbContext.Database.Migrate();
-    
 }
 
 // Map endpoints
