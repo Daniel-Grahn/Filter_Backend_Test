@@ -54,15 +54,17 @@ namespace FilterAPI.Services
         public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
 
         //--------------Clear Field (return a empty array)------------------
-        public async Task<Filter[]> ClearDataInFilters(string sourceId, int userId)
+        public async Task<IResult> ClearDataInFilters(string sourceId, int userId)
         {
             var filterList = await _repo.GetFiltersAsync(sourceId, userId);
 
-            for(var i = 0; i<= filterList.Length; i++) {
-                filterList[i].Data = [];
-                await _repo.UpdateFilterAsync(filterList[i]);
+            foreach (var filter in filterList)
+            {
+                filter.Data = [];
+                await _repo.UpdateFilterAsync(filter);
             }
-            return filterList;
+            
+            return TypedResults.Ok();
         }
 
           

@@ -13,7 +13,7 @@ namespace FilterAPI.Services
 
 
         //--------------Clear Field (return a empty array)------------------
-        Task<Filter[]> ClearDataInFilters(string sourceId, int userId);
+        Task<IResult> ClearDataInFilters(string sourceId, int userId);
 
 
     }
