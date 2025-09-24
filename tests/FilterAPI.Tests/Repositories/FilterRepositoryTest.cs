@@ -28,7 +28,7 @@ namespace FilterAPI.Integration.Tests.Repositories
 
             var context = new FilterDb(options);
             context.Database.EnsureDeleted();
-            context.Database.EnsureCreated(); // ensures tables exist
+            context.Database.EnsureCreated();
             context.SaveChanges();
 
             return context;
@@ -250,14 +250,14 @@ namespace FilterAPI.Integration.Tests.Repositories
 
             //add the same filter twice
 
-            //await Assert.ThrowsAsync<ArgumentException>(async () =>
+            //await Assert.ThrowsAsync<DbUpdateException>(async () =>
             //{
             //    await repo.AddStoredFilterAsync(newStoredFilter);
             //});
 
-            //StoredFilter[] findstoredFilter = await repo.GetStoredFiltersAsync();
-            //Assert.NotEmpty(findstoredFilter);
-            //Assert.Single(findstoredFilter);
+            StoredFilter[] findstoredFilter = await repo.GetStoredFiltersAsync();
+            Assert.NotEmpty(findstoredFilter);
+            Assert.Single(findstoredFilter);
 
             //add a new Storde filter
             StoredFilter secondStoredFilter = new()
@@ -266,7 +266,7 @@ namespace FilterAPI.Integration.Tests.Repositories
                 CompanyId = 22,
                 UserId = 1,
                 IsPersonal = true,
-                SourceId = "1",
+                SourceId = "2",
                 CreatedAt = DateTime.Now,
             };
             await repo.AddStoredFilterAsync(secondStoredFilter);
