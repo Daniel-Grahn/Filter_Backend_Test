@@ -1,58 +1,49 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using FilterAPI.Data;
 using FilterAPI.Services;
 using FilterAPI.DTOs;
+using Microsoft.AspNetCore.Mvc.Testing;
+using FilterAPI.Integration.Tests.Data;
+using System.Reflection;
 
 namespace FilterAPI.Integration.Tests.Services
 {
-    public class FilterServiceTests : IClassFixture<WebApplicationFactory<Program>>
+    //[Collection("Sequential")] // Ser till att tester körs seriellt
+    public class FilterServiceTests : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly TestDatabaseFixture _fixture;
 
-        public FilterServiceTests(WebApplicationFactory<Program> factory)
+        public FilterServiceTests(TestDatabaseFixture fixture)
         {
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    // Remove existing DbContext registration
-                    var descriptor = services.SingleOrDefault(
-                        d => d.ServiceType == typeof(DbContextOptions<FilterDb>));
-                    if (descriptor != null)
-                        services.Remove(descriptor);
+            _fixture = fixture;
+        }
 
-                    // Register DbContext with a unique test database per test
-                    var dbName = $"FiltersDbTest_{Guid.NewGuid()}";
-                    var connectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION_TEMPLATE")
-                        ?? $"Server=localhost,1433;Database={dbName};User Id=sa;Password=BuildingGroupGiraffe9182;TrustServerCertificate=true;";
+        // Reset database before each test
+        public async Task InitializeAsync() => await _fixture.ResetDatabaseAsync();
+        public Task DisposeAsync() => Task.CompletedTask;
 
-                    services.AddDbContext<FilterDb>(options =>
-                        options.UseSqlServer(connectionString));
-                });
-            });
+        private (IFilterService service, FilterDb db) GetServices()
+        {
+            var scope = _fixture.Factory.Services.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IFilterService>();
+            var db = scope.ServiceProvider.GetRequiredService<FilterDb>();
+            return (service, db);
         }
 
         [Fact]
         public async Task GetFiltersAsync_Empty()
         {
-            using var scope = _factory.Services.CreateScope();
-            var filterService = scope.ServiceProvider.GetRequiredService<IFilterService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<FilterDb>();
-            await dbContext.Database.EnsureCreatedAsync();
+            var (filterService, _) = GetServices();
 
             var filters = await filterService.GetFiltersAsync("nonexistent", 999);
             Assert.Empty(filters);
         }
-        
+
         [Fact]
         public async Task GetFiltersAsync_Find()
         {
-            using var scope = _factory.Services.CreateScope();
-            var filterService = scope.ServiceProvider.GetRequiredService<IFilterService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<FilterDb>();
-            await dbContext.Database.EnsureCreatedAsync();
+            var (filterService, _) = GetServices();
 
             var filters = await filterService.GetFiltersAsync("nonexistent", 999);
             Assert.Empty(filters);
@@ -65,6 +56,7 @@ namespace FilterAPI.Integration.Tests.Services
             };
 
             await filterService.AddOrUpdateFilterAsync(filter);
+
             filters = await filterService.GetFiltersAsync("nonexistent", 999);
             Assert.Single(filters);
             Assert.Equal("myFilter", filters[0].FieldName);
@@ -73,10 +65,7 @@ namespace FilterAPI.Integration.Tests.Services
         [Fact]
         public async Task AddOrUpdateFilterAsync_Add()
         {
-            using var scope = _factory.Services.CreateScope();
-            var filterService = scope.ServiceProvider.GetRequiredService<IFilterService>();
-            var dbContext = scope.ServiceProvider.GetRequiredService<FilterDb>();
-            await dbContext.Database.EnsureCreatedAsync();
+            var (filterService, _) = GetServices();
 
             var filter = new FilterRequestDTO
             {
@@ -85,18 +74,93 @@ namespace FilterAPI.Integration.Tests.Services
                 SourceId = "test"
             };
 
-            var nofilters = await filterService.GetFiltersAsync("test", 1);
-            // Act
-            await filterService.AddOrUpdateFilterAsync(filter);
-            var filterList = await filterService.GetFiltersAsync("test", 1);
 
-            //// Assert
+            var filterList = await filterService.GetFiltersAsync("test", 1);
+            Assert.Empty(filterList);
+
+            await filterService.AddOrUpdateFilterAsync(filter);
+            filterList = await filterService.GetFiltersAsync("test", 1);
             Assert.Single(filterList);
+
             var savedFilter = filterList.First();
             Assert.Equal("name", savedFilter.FieldName);
             Assert.Equal(1, savedFilter.UserId);
             Assert.Equal("test", savedFilter.SourceId);
         }
 
+        [Fact]
+        public async Task AddOrUpdateFilterAsync_AddMultiple()
+        {
+            var (filterService, _) = GetServices();
+
+            FilterRequestDTO[] filters = [
+                new() {FieldName = "status", UserId = 1, SourceId = "test"},
+                new() {FieldName = "category", UserId = 1, SourceId = "test"},
+                new() {FieldName = "status", UserId = 1, SourceId = "develop"}];
+
+            var filterList = await filterService.GetFiltersAsync("test", 1);
+            Assert.Empty(filterList);
+
+            foreach(var filter in filters)
+            {
+                await filterService.AddOrUpdateFilterAsync(filter);
+            }
+
+            filterList = await filterService.GetFiltersAsync("test", 1);
+            Assert.Equal(2, filterList.Length);
+
+            foreach (var filter in filterList)
+            {
+                Assert.Equal("test", filter.SourceId);
+                Assert.Equal(1, filter.UserId);
+            }
+        }
+        
+        [Fact]
+        public async Task AddOrUpdateFilterAsync_AddSameFilterTwice()
+        {
+            var (filterService, _) = GetServices();
+            
+            FilterRequestDTO filter = new() {FieldName = "status", UserId = 1, SourceId = "test"};
+            await filterService.AddOrUpdateFilterAsync(filter);
+            var theFilter = await filterService.GetFiltersAsync("test", 1);
+            Assert.Single(theFilter);
+
+
+
+            await filterService.AddOrUpdateFilterAsync(filter);
+            theFilter = await filterService.GetFiltersAsync("test", 1);
+            Assert.Single(theFilter);
+        }
+        
+        [Fact]
+        public async Task AddOrUpdateFilterAsync_UpdateFilter()
+        {
+            var (filterService, _) = GetServices();
+            
+            FilterRequestDTO filter = new() {FieldName = "status", UserId = 1, SourceId = "test", Data=["c-1"]};
+            await filterService.AddOrUpdateFilterAsync(filter);
+            var Filters = await filterService.GetFiltersAsync("test", 1);
+            Assert.Single(Filters);
+
+            var theFilter = Filters[0];
+            Assert.Equal("status", theFilter.FieldName);
+            Assert.Equal(1, theFilter.UserId);
+            Assert.Equal("test", theFilter.SourceId);
+            Assert.NotNull(theFilter.Data);
+            Assert.Equal(["c-1"], theFilter.Data);
+
+            FilterRequestDTO updateFilter = new() { FieldName = "status", UserId = 1, SourceId = "test", Data = ["c-1", "c-2"] };
+            await filterService.AddOrUpdateFilterAsync(updateFilter);
+            Filters = await filterService.GetFiltersAsync("test", 1);
+            Assert.Single(Filters);
+
+            theFilter = Filters[0];
+            Assert.Equal("status", theFilter.FieldName);
+            Assert.Equal(1, theFilter.UserId);
+            Assert.Equal("test", theFilter.SourceId);
+            Assert.NotNull(theFilter.Data);
+            Assert.Equal(["c-1", "c-2"], theFilter.Data);
+        }
     }
 }
