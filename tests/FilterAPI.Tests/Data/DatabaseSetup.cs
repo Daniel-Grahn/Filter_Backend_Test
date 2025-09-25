@@ -32,7 +32,6 @@ public class TestDatabaseFixture : IAsyncLifetime
                 });
             });
 
-        // Ensure schema exists
         await ResetDatabaseAsync();
     }
 
@@ -43,9 +42,6 @@ public class TestDatabaseFixture : IAsyncLifetime
         await db.Database.EnsureDeletedAsync();
     }
 
-    /// <summary>
-    /// Clears and recreates the schema (call this before each test).
-    /// </summary>
     public async Task ResetDatabaseAsync()
     {
         using var scope = Factory.Services.CreateScope();

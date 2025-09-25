@@ -60,9 +60,6 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Empty(noFilters);
         }
 
-
-
-
         [Fact]
         public async Task GetFilterByFieldNameAsync()
         {
@@ -117,8 +114,6 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Equal(2, justFilter.Length);
         }
 
-
-
         [Fact]
         public async Task UpdateFilterAsyncTest()
         {
@@ -141,8 +136,6 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.NotNull(updatedfoundFilter.Data);
             Assert.Equal(["C-1", "C-2"], updatedfoundFilter.Data);
         }
-
-
 
         // StoredFilter
         [Fact]
@@ -308,12 +301,10 @@ namespace FilterAPI.Integration.Tests.Repositories
             var repo = new FilterRepository(db);
 
             FilterComposition[] filterCompositionList = await repo.GetFilterCompositionsAsync(22, "1");
-
             Assert.Empty(filterCompositionList);
 
             // There is no way to test this properly
             // there is no add/get/update method for Filter Composition
         }
-
     }
 }
