@@ -10,8 +10,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//test #2
-
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.CreateMap<FilterRequestDTO, Filter>();
