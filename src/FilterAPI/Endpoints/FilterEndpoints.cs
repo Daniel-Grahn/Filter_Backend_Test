@@ -40,7 +40,6 @@ namespace FilterAPI.Endpoints
                 var results = await service.GetFilterCompositionsAsync(companyId, sourceId);
                 return results.Length > 0 ? Results.Ok(results) : Results.NotFound();
             });
-
             
             //--------------Clear Field (return a empty array)------------------
             filterGroup.MapPut("/page/{sourceId}/user/{userId}/clear", async (string sourceId, int userId, IFilterService service) =>
