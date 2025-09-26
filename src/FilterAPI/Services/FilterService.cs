@@ -49,7 +49,20 @@ namespace FilterAPI.Services
                 await _repo.UpdateStoredFilterAsync(existing);
                 return TypedResults.NoContent();
             }
+        }
 
+        public async Task<IResult> DeleteStoredFilterAsync(int id)
+        {
+            var existing = await _repo.GetStoredFilterAsync(id);
+            if (existing == null)
+            {
+                return TypedResults.NotFound();
+            }
+            else
+            {
+                await _repo.DeleteStoredFilterAsync(existing);
+                return TypedResults.NoContent();
+            }
         }
         public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
 
