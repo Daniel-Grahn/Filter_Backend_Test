@@ -35,6 +35,12 @@ namespace FilterAPI.Endpoints
                 return Results.NoContent();
             });
 
+            filterGroup.MapDelete("/deletefilter/{id}", async (int id, IFilterService service) =>
+            {
+                await service.DeleteStoredFilterAsync(id);
+                return Results.NoContent();
+            });
+
             filterGroup.MapGet("/getcomposition/company/{companyId}/page/{sourceId}", async (int companyId, string sourceId, IFilterService service) =>
             {
                 var results = await service.GetFilterCompositionsAsync(companyId, sourceId);

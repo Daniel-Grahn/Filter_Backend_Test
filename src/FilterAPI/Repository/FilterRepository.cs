@@ -49,6 +49,12 @@ namespace FilterAPI.Repositories
             await _db.SaveChangesAsync();   
         }
 
+        public async Task DeleteStoredFilterAsync(StoredFilter sf)
+        {
+            _db.StoredFilter.Remove(sf);
+            await _db.SaveChangesAsync();
+        }
+
         // FilterComposition methods
         public async Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) =>
             await _db.FilterComposition
