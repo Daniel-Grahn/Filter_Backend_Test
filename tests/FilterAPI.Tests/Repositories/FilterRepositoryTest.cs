@@ -3,44 +3,38 @@ using Microsoft.EntityFrameworkCore;
 using FilterAPI.Data;
 using FilterAPI.Repositories;
 using FilterAPI.Models;
+using FilterAPI.Integration.Tests.Data;
 
 namespace FilterAPI.Integration.Tests.Repositories
 {
-    public class FilterRepositoryTest
+    [Collection("Sequential")]
+    public class FilterRepositoryTest : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
     {
-        //Temporary Db
-        //private static FilterDb GetInMemoryDb()
-        //{
-        //    var options = new DbContextOptionsBuilder<FilterDb>()
-        //        .UseInMemoryDatabase(databaseName: "TestDb_" + Guid.NewGuid())
-        //        .Options;
-        //    return new FilterDb(options);
-        //}
+        private readonly TestDatabaseFixture _fixture;
 
-        private static FilterDb GetTestDb()
+        public FilterRepositoryTest(TestDatabaseFixture fixture)
         {
-            var connectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION")
-                ?? "Server=localhost,1433;Database=FiltersDbTest;User Id=sa;Password=BuildingGroupGiraffe9182;TrustServerCertificate=true;";
-
-            var options = new DbContextOptionsBuilder<FilterDb>()
-                .UseSqlServer(connectionString)
-                .Options;
-
-            var context = new FilterDb(options);
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-            context.SaveChanges();
-
-            return context;
+            _fixture = fixture;
         }
 
+        // Reset DB before each test
+        public async Task InitializeAsync() => await _fixture.ResetDatabaseAsync();
+        public Task DisposeAsync() => Task.CompletedTask;
 
+        private FilterDb GetDbContext()
+        {
+            var options = new DbContextOptionsBuilder<FilterDb>()
+                .UseSqlServer(_fixture.ConnectionString)
+                .Options;
+
+            return new FilterDb(options);
+        }
 
         //Filter
         [Fact]
         public async Task GetFiltersAsync()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
             Filter[] filters = [new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" },
                                 new Filter { SourceId = "p1", UserId = 1, FieldName = "status" },
@@ -66,13 +60,10 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Empty(noFilters);
         }
 
-
-
-
         [Fact]
         public async Task GetFilterByFieldNameAsync()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
             var filter = new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" };
 
@@ -90,7 +81,7 @@ namespace FilterAPI.Integration.Tests.Repositories
         [Fact]
         public async Task AddFilterAsync() // Could be better (Fix this later)
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
             var filter = new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" };
 
@@ -123,13 +114,11 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Equal(2, justFilter.Length);
         }
 
-
-
         [Fact]
         public async Task UpdateFilterAsyncTest()
         {
             //add the filter
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
             var filter = new Filter { SourceId = "1", UserId = 2, FieldName = "Field2" };
             await repo.AddFilterAsync(filter);
@@ -148,13 +137,11 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Equal(["C-1", "C-2"], updatedfoundFilter.Data);
         }
 
-
-
         // StoredFilter
         [Fact]
         public async Task GetStoredFiltersAsyncTest()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
             StoredFilter[] storedFilters = await repo.GetStoredFiltersAsync();
             Assert.Empty(storedFilters);
@@ -196,7 +183,7 @@ namespace FilterAPI.Integration.Tests.Repositories
         [Fact]
         public async Task GetStoredFilterAsync()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
 
             //Before being added
@@ -224,7 +211,7 @@ namespace FilterAPI.Integration.Tests.Repositories
         [Fact]
         public async Task AddStoredFilterAsync() //Fix this later
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
 
             //Before being added
@@ -277,7 +264,7 @@ namespace FilterAPI.Integration.Tests.Repositories
         [Fact]
         public async Task UpdateStoredFilterAsync()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
 
             //add a storedFilter
@@ -310,16 +297,14 @@ namespace FilterAPI.Integration.Tests.Repositories
         [Fact]
         public async Task GetFilterCompositionsAsync()
         {
-            var db = GetTestDb();
+            var db = GetDbContext();
             var repo = new FilterRepository(db);
 
             FilterComposition[] filterCompositionList = await repo.GetFilterCompositionsAsync(22, "1");
-
             Assert.Empty(filterCompositionList);
 
             // There is no way to test this properly
             // there is no add/get/update method for Filter Composition
         }
-
     }
 }
