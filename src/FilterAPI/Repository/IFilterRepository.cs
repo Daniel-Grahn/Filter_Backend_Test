@@ -18,6 +18,8 @@ namespace FilterAPI.Repository
 
         Task UpdateStoredFilterAsync(StoredFilter sf);
 
+        Task DeleteStoredFilterAsync(StoredFilter sf);
+
         // FilterComposition
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
     }

@@ -6,6 +6,9 @@ using FilterAPI.DTOs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using FilterAPI.Integration.Tests.Data;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using FilterAPI.Models;
 
 namespace FilterAPI.Integration.Tests.Services
 {
@@ -101,7 +104,7 @@ namespace FilterAPI.Integration.Tests.Services
             var filterList = await filterService.GetFiltersAsync("test", 1);
             Assert.Empty(filterList);
 
-            foreach(var filter in filters)
+            foreach (var filter in filters)
             {
                 await filterService.AddOrUpdateFilterAsync(filter);
             }
@@ -115,13 +118,13 @@ namespace FilterAPI.Integration.Tests.Services
                 Assert.Equal(1, filter.UserId);
             }
         }
-        
+
         [Fact]
         public async Task AddOrUpdateFilterAsync_AddSameFilterTwice()
         {
             var (filterService, _) = GetServices();
-            
-            FilterRequestDTO filter = new() {FieldName = "status", UserId = 1, SourceId = "test"};
+
+            FilterRequestDTO filter = new() { FieldName = "status", UserId = 1, SourceId = "test" };
             await filterService.AddOrUpdateFilterAsync(filter);
             var theFilter = await filterService.GetFiltersAsync("test", 1);
             Assert.Single(theFilter);
@@ -132,13 +135,13 @@ namespace FilterAPI.Integration.Tests.Services
             theFilter = await filterService.GetFiltersAsync("test", 1);
             Assert.Single(theFilter);
         }
-        
+
         [Fact]
         public async Task AddOrUpdateFilterAsync_UpdateFilter()
         {
             var (filterService, _) = GetServices();
-            
-            FilterRequestDTO filter = new() {FieldName = "status", UserId = 1, SourceId = "test", Data=["c-1"]};
+
+            FilterRequestDTO filter = new() { FieldName = "status", UserId = 1, SourceId = "test", Data = ["c-1"] };
             await filterService.AddOrUpdateFilterAsync(filter);
             var Filters = await filterService.GetFiltersAsync("test", 1);
             Assert.Single(Filters);
@@ -162,5 +165,194 @@ namespace FilterAPI.Integration.Tests.Services
             Assert.NotNull(theFilter.Data);
             Assert.Equal(["c-1", "c-2"], theFilter.Data);
         }
+
+        [Fact]
+        public async Task GetStoredFiltersAsync_Empty()
+        {
+            var (filterService, _) = GetServices();
+            var StoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Empty(StoredFilters);
+        }
+
+        [Fact]
+        public async Task GetStoredFiltersAsync_Find()
+        {
+            var (filterService, _) = GetServices();
+            var storedFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Empty(storedFilters);
+
+            StoredFilterRequestDTO storedFileter = new() { Title = "foo", CompanyId = 22, UserId = 1, SourceId = "1" }; //Title could be null but is not allowed in DB
+
+            await filterService.AddOrUpdateStoredFilterAsync(1, storedFileter);
+
+            storedFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Single(storedFilters);
+
+            var theStoredFilter = storedFilters[0];
+            Assert.Equal("foo", theStoredFilter.Title);
+            Assert.Equal(22, theStoredFilter.CompanyId);
+            Assert.Equal("1", theStoredFilter.SourceId);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateStoredFilterAsync_AddSimple()
+        {
+            var (filterService, _) = GetServices();
+            var nostoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Empty(nostoredFilters);
+
+            StoredFilterRequestDTO storedFilter = new() { Title = "foo", SourceId = "1" };
+            await filterService.AddOrUpdateStoredFilterAsync(1, storedFilter);
+
+            var allStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Single(allStoredFilters);
+
+            var theStoredFilter = allStoredFilters[0];
+            Assert.Equal("foo", theStoredFilter.Title);
+            Assert.Equal("1", theStoredFilter.SourceId);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateStoredFilterAsync_AddMultple()
+        {
+            var (filterService, _) = GetServices();
+            var nostoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Empty(nostoredFilters);
+
+            StoredFilterRequestDTO[] storedFilters = [
+                new() { Title="foo", CompanyId = 21, UserId=1, SourceId="1"},
+                new() { Title="bar", CompanyId = 22, UserId=1, SourceId="3"},
+                new() { Title="ten", CompanyId = 23, UserId=1, SourceId="5"}
+            ];
+
+            for (int i = 0; i < storedFilters.Length; i++)
+            {
+                await filterService.AddOrUpdateStoredFilterAsync(i + 1, storedFilters[i]);
+            }
+
+            var allStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Equal(3, allStoredFilters.Length);
+
+            var theStoredFilter = allStoredFilters[0];
+            Assert.Equal("foo", theStoredFilter.Title);
+            Assert.Equal(21, theStoredFilter.CompanyId);
+            Assert.Equal("1", theStoredFilter.SourceId);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateStoredFilterAsync_Uppdate()
+        {
+            var (filterService, _) = GetServices();
+            StoredFilterRequestDTO storedFilter = new() { Title = "foo", CompanyId = 21, UserId = 1, SourceId = "1", IsPersonal = true };
+            await filterService.AddOrUpdateStoredFilterAsync(1, storedFilter);
+
+            var allStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Single(allStoredFilters);
+
+            var theStoredFilter = allStoredFilters[0];
+            Assert.Equal("foo", theStoredFilter.Title);
+            Assert.True(theStoredFilter.IsPersonal);
+
+            storedFilter = new() { Title = "foo", CompanyId = 21, UserId = 1, SourceId = "1", IsPersonal = false };
+            await filterService.AddOrUpdateStoredFilterAsync(1, storedFilter);
+
+            allStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Single(allStoredFilters);
+
+            theStoredFilter = allStoredFilters[0];
+            Assert.Equal("foo", theStoredFilter.Title);
+            Assert.False(theStoredFilter.IsPersonal);
+        }
+
+        //No test for GetFilterCompositionsAsync
+
+        [Fact]
+        public async Task ClearDataInFilters_WithoutData()
+        {
+            var (filterService, _) = GetServices();
+            FilterRequestDTO filter = new()
+            {
+                FieldName = "myFilter",
+                UserId = 999,
+                SourceId = "nonexistent",
+                Data = null
+            };
+            await filterService.AddOrUpdateFilterAsync(filter);
+
+            var allFilters = await filterService.GetFiltersAsync("nonexistent", 999);
+            Assert.Single(allFilters);
+
+            var theFilter = allFilters[0];
+            Assert.Equal("myFilter", theFilter.FieldName);
+            Assert.Empty(theFilter.Data);
+
+            await filterService.ClearDataInFilters("nonexistent", 999);
+
+            allFilters = await filterService.GetFiltersAsync("nonexistent", 999);
+            Assert.Single(allFilters);
+
+            theFilter = allFilters[0];
+            Assert.Equal("myFilter", theFilter.FieldName);
+            Assert.Empty(theFilter.Data);
+        }
+
+
+        [Fact]
+        public async Task ClearDataInFilters_WithData()
+        {
+
+            var (filterService, _) = GetServices();
+            FilterRequestDTO[] filters = [
+                new(){ FieldName = "foo", UserId = 1, SourceId = "nonexistent", Data = ["f1"]},
+                new(){ FieldName = "bar", UserId = 999, SourceId = "nonexistent", Data = ["b1", "b2"]}
+            ];
+
+            foreach(var filter in filters)
+            {
+                await filterService.AddOrUpdateFilterAsync(filter);
+            }
+
+            var allFilters = await filterService.GetFiltersAsync("nonexistent", 999);
+            Assert.Single(allFilters);
+            var theFilter = allFilters[0];
+            Assert.Equal("bar", theFilter.FieldName);
+            Assert.Equal(["b1", "b2"], theFilter.Data);
+
+            allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
+            Assert.Single(allFilters);
+            theFilter = allFilters[0];
+            Assert.Equal("foo", theFilter.FieldName);
+            Assert.Equal(["f1"], theFilter.Data);
+
+            await filterService.ClearDataInFilters("nonexistent", 999);
+
+
+            allFilters = await filterService.GetFiltersAsync("nonexistent", 999);
+            Assert.Single(allFilters);
+
+            theFilter = allFilters[0]; 
+            Assert.Equal("bar", theFilter.FieldName);
+            Assert.Empty(theFilter.Data);
+
+            allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
+            Assert.Single(allFilters);
+            theFilter = allFilters[0];
+            Assert.Equal("foo", theFilter.FieldName);
+            Assert.Equal(["f1"], theFilter.Data);
+        }
+
+        [Fact]
+        public async Task ClearDataInFilters_WithNoFilter()
+        {
+            var (filterService, _) = GetServices();
+            Filter[] allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
+            Assert.Empty(allFilters);
+
+            await filterService.ClearDataInFilters("nonexistent", 999);
+
+            allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
+            Assert.Empty(allFilters);
+        }
+
     }
 }
