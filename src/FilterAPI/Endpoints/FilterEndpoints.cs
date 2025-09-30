@@ -1,5 +1,6 @@
 ﻿using FilterAPI.DTOs;
 using FilterAPI.Services;
+using System.Security.Claims;
 
 namespace FilterAPI.Endpoints
 {
@@ -22,11 +23,12 @@ namespace FilterAPI.Endpoints
                 return Results.Ok(updated);
             });
 
-            filterGroup.MapGet("/getsavedfilters", async (IFilterService service) =>
+            filterGroup.MapGet("/getsavedfilters", async (IFilterService service, ClaimsPrincipal claims) =>
             {
                 var results = await service.GetStoredFiltersAsync();
-                return Results.Ok(results);
-            });
+                var test = claims;
+                return Results.Ok(results + $"Auth: {claims.Identity?.IsAuthenticated}");
+            }).RequireAuthorization();
 
             //StoredFilterRequestDTO
             filterGroup.MapPut("/savefilter/{id}", async (int id, StoredFilterRequestDTO sf, IFilterService service) =>
@@ -53,6 +55,18 @@ namespace FilterAPI.Endpoints
                 var results = await service.ClearDataInFilters(sourceId, userId);
                 return Results.Ok(results);
             });
+
+            filterGroup.MapGet("/whoami", (HttpContext context) =>
+            {
+                var user = context.User;
+                return user.Identity?.IsAuthenticated == true
+                    ? Results.Ok(new
+                    {
+                        Name = user.Identity.Name,
+                        Claims = user.Claims.Select(c => new { c.Type, c.Value })
+                    })
+                    : Results.Unauthorized();
+            }).RequireAuthorization(); // 👈 this line is crucial
 
 
         }
