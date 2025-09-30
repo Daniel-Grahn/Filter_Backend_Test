@@ -362,7 +362,7 @@ namespace FilterAPI.Integration.Tests.Services
                 new(){ FieldName = "bar", UserId = 999, SourceId = "nonexistent", Data = ["b1", "b2"]}
             ];
 
-            foreach(var filter in filters)
+            foreach (var filter in filters)
             {
                 await filterService.AddOrUpdateFilterAsync(filter);
             }
@@ -371,29 +371,30 @@ namespace FilterAPI.Integration.Tests.Services
             Assert.Single(allFilters);
             var theFilter = allFilters[0];
             Assert.Equal("bar", theFilter.FieldName);
+            Assert.NotNull(theFilter.Data);
             Assert.Equal(["b1", "b2"], theFilter.Data);
 
             allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
             Assert.Single(allFilters);
             theFilter = allFilters[0];
             Assert.Equal("foo", theFilter.FieldName);
+            Assert.NotNull(theFilter.Data);
             Assert.Equal(["f1"], theFilter.Data);
 
             await filterService.ClearDataInFilters("nonexistent", 999);
 
+            var user999Filters = await filterService.GetFiltersAsync("nonexistent", 999);
+            var user1Filters = await filterService.GetFiltersAsync("nonexistent", 1);
 
-            allFilters = await filterService.GetFiltersAsync("nonexistent", 999);
-            Assert.Single(allFilters);
+            var user999Filter = Assert.Single(user999Filters);
+            Assert.Equal("bar", user999Filter.FieldName);
+            Assert.NotNull(user999Filter.Data);
+            Assert.Empty(user999Filter.Data);
 
-            theFilter = allFilters[0]; 
-            Assert.Equal("bar", theFilter.FieldName);
-            Assert.Empty(theFilter.Data);
-
-            allFilters = await filterService.GetFiltersAsync("nonexistent", 1);
-            Assert.Single(allFilters);
-            theFilter = allFilters[0];
-            Assert.Equal("foo", theFilter.FieldName);
-            Assert.Equal(["f1"], theFilter.Data);
+            var user1Filter = Assert.Single(user1Filters);
+            Assert.Equal("foo", user1Filter.FieldName);
+            Assert.NotNull(user1Filter.Data);
+            Assert.Equal(["f1"], user1Filter.Data);
         }
 
         [Fact]
