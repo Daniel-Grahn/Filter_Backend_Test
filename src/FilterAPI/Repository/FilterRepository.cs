@@ -50,8 +50,10 @@ namespace FilterAPI.Repositories
 
         public async Task DeleteStoredFilterAsync(StoredFilter sf)
         {
+
             _db.StoredFilter.Remove(sf);
             await _db.SaveChangesAsync();
+            
         }
 
         // FilterComposition methods

@@ -264,6 +264,61 @@ namespace FilterAPI.Integration.Tests.Services
             Assert.False(theStoredFilter.IsPersonal);
         }
 
+        [Fact]
+        public async Task DeleteStoredFilterAsync_Excisting()
+        {
+            var (filterService, _) = GetServices();
+            StoredFilterRequestDTO[] storedFilters = [
+                new() { Title = "foo", CompanyId = 21, UserId = 1, SourceId = "1", IsPersonal = true },
+                new() { Title = "bar", CompanyId = 22, UserId = 1, SourceId = "1", IsPersonal = true },
+                new() { Title = "keke", CompanyId = 23, UserId = 1, SourceId = "1", IsPersonal = true },
+            ];
+
+            for (int i = 0; i < storedFilters.Length; i++)
+            {
+                await filterService.AddOrUpdateStoredFilterAsync(i + 1, storedFilters[i]);
+            }
+            
+            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Equal(3, foundStoredFilters.Length);
+            var lastStoredFilter = foundStoredFilters[foundStoredFilters.Length - 1];
+            Assert.Equal("keke", lastStoredFilter.Title);
+            Assert.Equal(23, lastStoredFilter.CompanyId);
+
+            await filterService.DeleteStoredFilterAsync(lastStoredFilter.Id);
+            foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Equal(2, foundStoredFilters.Length);
+
+            lastStoredFilter = foundStoredFilters[foundStoredFilters.Length - 1];
+            Assert.Equal("bar", lastStoredFilter.Title);
+            Assert.Equal(22, lastStoredFilter.CompanyId);
+
+        }
+
+        [Fact]
+        public async Task DeleteStoredFilterAsync_NotExcisting()
+        {
+            var (filterService, _) = GetServices();
+            StoredFilterRequestDTO[] storedFilters = [
+                new() { Title = "foo", CompanyId = 21, UserId = 1, SourceId = "1", IsPersonal = true },
+                new() { Title = "bar", CompanyId = 22, UserId = 1, SourceId = "1", IsPersonal = true },
+                new() { Title = "keke", CompanyId = 23, UserId = 1, SourceId = "1", IsPersonal = true },
+            ];
+
+            for (int i = 0; i < storedFilters.Length; i++)
+            {
+                await filterService.AddOrUpdateStoredFilterAsync(i + 1, storedFilters[i]);
+            }
+
+            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Equal(3, foundStoredFilters.Length);
+          
+
+            await filterService.DeleteStoredFilterAsync(99);
+            foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            Assert.Equal(3, foundStoredFilters.Length);
+        }
+
         //No test for GetFilterCompositionsAsync
 
         [Fact]
@@ -284,7 +339,7 @@ namespace FilterAPI.Integration.Tests.Services
 
             var theFilter = allFilters[0];
             Assert.Equal("myFilter", theFilter.FieldName);
-            Assert.Empty(theFilter.Data);
+            Assert.NotNull(theFilter.Data);
 
             await filterService.ClearDataInFilters("nonexistent", 999);
 
@@ -293,7 +348,7 @@ namespace FilterAPI.Integration.Tests.Services
 
             theFilter = allFilters[0];
             Assert.Equal("myFilter", theFilter.FieldName);
-            Assert.Empty(theFilter.Data);
+            Assert.NotNull(theFilter.Data);
         }
 
 

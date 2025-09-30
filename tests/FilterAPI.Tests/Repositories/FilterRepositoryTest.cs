@@ -294,34 +294,30 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Equal("YourFilter", getStoredFilter.Title);
         }
 
+        [Fact]
         public async Task DeleteStoredFilterAsync()
         {
             var db = GetDbContext();
             var repo = new FilterRepository(db);
 
             StoredFilter[] StoredFilters = [
-                new() { Id = 1, Title = "myFilter", CompanyId = 22, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now},
-                new() { Id = 2, Title = "foo", CompanyId = 22, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now},
-                new() { Id = 3, Title = "bar", CompanyId = 22, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now}
+                new() { Title = "myFilter", CompanyId = 21, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now},
+                new() { Title = "foo", CompanyId = 22, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now},
+                new() { Title = "bar", CompanyId = 23, UserId = 1, IsPersonal = true, SourceId = "1", CreatedAt = DateTime.Now}
             ];
 
-            foreach( StoredFilter sf in StoredFilters)
+            foreach (StoredFilter sf in StoredFilters)
             {
-               await repo.AddStoredFilterAsync(sf);
+                await repo.AddStoredFilterAsync(sf);
             }
 
             StoredFilter[] allStoredFilter = await repo.GetStoredFiltersAsync();
-            Assert.Equal(3, allStoredFilter.Length);  
-            
+            Assert.Equal(3, allStoredFilter.Length);
+
             StoredFilter? laststoredFilter = await repo.GetStoredFilterAsync(3);
             Assert.NotNull(laststoredFilter);
-            Assert.Equal(3, laststoredFilter.Id);
+            Assert.Equal(23, laststoredFilter.CompanyId);
             Assert.Equal("bar", laststoredFilter.Title);
-            await repo.DeleteStoredFilterAsync(laststoredFilter);
-
-            allStoredFilter = await repo.GetStoredFiltersAsync();
-            Assert.Equal(2, allStoredFilter.Length);
-
             await repo.DeleteStoredFilterAsync(laststoredFilter);
 
             allStoredFilter = await repo.GetStoredFiltersAsync();
