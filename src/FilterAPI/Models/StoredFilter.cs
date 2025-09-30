@@ -14,27 +14,28 @@ public class StoredFilter
     public DateTime? UpdatedAt { get; set; }
     public string? Filters { get; set; }
 
-    public void Update(StoredFilterRequestDTO request)
+    public void Update(StoredFilter request)
     {
         if (request == null) return;
         bool isUpdated = false;
 
-        if (request.Title != null)
+        if (Title != request.Title)
         {
             Title = request.Title;
             isUpdated = true;
         }
-        if (request.Filters != null)
+        if (Filters != request.Filters)
         {
             Filters = request.Filters;
             isUpdated = true;
         }
 
-        if (request.IsPersonal != null)
+        if (IsPersonal != request.IsPersonal)
         {
-            IsPersonal = request.IsPersonal.Value;
+            IsPersonal = request.IsPersonal;
             isUpdated = true;
         }
+
         if (isUpdated)
         {
             UpdatedAt = DateTime.UtcNow;

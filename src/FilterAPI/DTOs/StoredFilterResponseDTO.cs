@@ -2,9 +2,8 @@
 {
     public record StoredFilterResponseDTO
     (
+       int Id,
        string Title,
-       int CompanyId,
-       int UserId,
        bool IsPersonal,
        string SourceId,
        string Filters

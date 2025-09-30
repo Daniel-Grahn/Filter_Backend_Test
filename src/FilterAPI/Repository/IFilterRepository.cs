@@ -10,6 +10,7 @@ namespace FilterAPI.Repository
 
         Task AddFilterAsync(Filter filter); //We do not throw an ArgumentException if we try to add two filter that are identical
         Task UpdateFilterAsync(Filter filter);
+        Task DeleteFilterAsync(Filter filter);
 
         // StoredFilter
         Task<StoredFilter[]> GetStoredFiltersAsync();
