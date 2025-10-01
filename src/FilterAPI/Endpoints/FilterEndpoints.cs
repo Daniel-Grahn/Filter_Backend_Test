@@ -35,7 +35,7 @@ namespace FilterAPI.Endpoints
             }).RequireAuthorization();
 
             //FilterRequestDTO
-            filterGroup.MapPut("/", async (FilterRequestDTO filter, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapPut("/", async (Filter filter, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
                 Filter inputFilter = mapper.Map<Filter>(filter);
