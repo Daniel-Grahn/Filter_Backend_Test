@@ -23,5 +23,10 @@ namespace FilterAPI.Repository
 
         // FilterComposition
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
+
+        Task<FilterComposition?> GetFilterCompositionAsync(int id);
+        Task UpdateFilterCompositionAsync(FilterComposition fc);
+
+
     }
 }

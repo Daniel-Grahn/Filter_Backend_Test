@@ -66,6 +66,15 @@ namespace FilterAPI.Repositories
             await _db.FilterComposition
                 .Where(fc => fc.CompanyId == companyId && fc.SourceId == sourceId)
                 .ToArrayAsync();
+
+        public async Task<FilterComposition?> GetFilterCompositionAsync(int id) => await _db.FilterComposition.FindAsync(id);
+        
+
+        public async Task UpdateFilterCompositionAsync(FilterComposition fc)
+        {
+            _db.FilterComposition.Update(fc);
+            await _db.SaveChangesAsync();
+        }
     }
 }
 

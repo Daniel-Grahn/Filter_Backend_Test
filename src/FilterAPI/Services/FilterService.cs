@@ -76,5 +76,19 @@ namespace FilterAPI.Services
         }
         public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
 
+        public async Task<IResult> UpdateFilterCompositionAsync(FilterComposition fc)
+        {
+            var existing = await _repo.GetFilterCompositionAsync(fc.Id); 
+            if(existing != null)
+            {
+                existing.Update(fc);
+                await _repo.UpdateFilterCompositionAsync(existing);
+                return TypedResults.NoContent();
+            }
+            else
+            {
+                return TypedResults.NotFound();
+            }            
+        }
     }
 }

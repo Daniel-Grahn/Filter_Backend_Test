@@ -12,5 +12,6 @@ namespace FilterAPI.Services
         Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf);
         Task<IResult> DeleteStoredFilterAsync(int id);
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
+        Task<IResult> UpdateFilterCompositionAsync(FilterComposition fc);
     }
 }
