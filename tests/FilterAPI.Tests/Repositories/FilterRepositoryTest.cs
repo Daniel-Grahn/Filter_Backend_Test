@@ -68,7 +68,7 @@ namespace FilterAPI.Integration.Tests.Repositories
             var filter = new Filter { SourceId = "p1", UserId = 1, FieldName = "catagory" };
 
             //There is no filter to get
-            Filter noFilter = await repo.GetFilterByFieldNameAsync("p1", 1, "catagory");
+            Filter? noFilter = await repo.GetFilterByFieldNameAsync("p1", 1, "catagory");
             Assert.Null(noFilter);
 
             //Here we add the filter
@@ -125,8 +125,9 @@ namespace FilterAPI.Integration.Tests.Repositories
             await repo.AddFilterAsync(filter);
 
             //find the filter
-            var foundFilter = await repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
+            Filter? foundFilter = await repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
             Assert.Equal(filter, foundFilter);
+            Assert.NotNull(foundFilter);
             Assert.Null(foundFilter.Data);
 
             //Update the filter
@@ -134,13 +135,51 @@ namespace FilterAPI.Integration.Tests.Repositories
             await repo.UpdateFilterAsync(foundFilter);
 
             var updatedfoundFilter = await repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
+            Assert.NotNull(updatedfoundFilter);
             Assert.NotNull(updatedfoundFilter.Data);
             Assert.Equal(["C-1", "C-2"], updatedfoundFilter.Data);
         }
 
-        // StoredFilter
+
         [Fact]
-        public async Task GetStoredFiltersAsyncTest()
+        public async Task DeleteFilterAsync()
+        {
+            var db = GetDbContext();
+            var repo = new FilterRepository(db);
+
+            Filter[] allFilters = await repo.GetFiltersAsync("p1", 1);
+            Assert.Empty(allFilters);
+
+            Filter[] filters = [
+                new() { SourceId = "p1", UserId = 1, FieldName = "status" },
+                new() { SourceId = "p1", UserId = 1, FieldName = "catagory" },
+                new() { SourceId = "p1", UserId = 2, FieldName = "catagory" }
+            ];
+
+            foreach (var filter in filters) { 
+                await repo.AddFilterAsync(filter);        
+            }
+
+            allFilters = await repo.GetFiltersAsync("p1", 1);
+            Assert.Equal(2, allFilters.Length);
+            Filter aFilter = allFilters[0];
+            Assert.Equal("p1", aFilter.SourceId);
+            Assert.Equal(1, aFilter.UserId);
+            Assert.Equal("catagory", aFilter.FieldName);
+
+            await repo.DeleteFilterAsync(aFilter);
+
+            allFilters = await repo.GetFiltersAsync("p1", 1);
+            Assert.Single(allFilters);
+            aFilter = allFilters[0];
+            Assert.Equal("p1", aFilter.SourceId);
+            Assert.Equal(1, aFilter.UserId);
+            Assert.Equal("status", aFilter.FieldName);
+        }
+
+       // StoredFilter
+       [Fact]
+        public async Task GetStoredFiltersAsync()
         {
             var db = GetDbContext();
             var repo = new FilterRepository(db);
