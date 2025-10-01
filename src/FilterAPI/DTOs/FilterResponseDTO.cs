@@ -3,7 +3,6 @@
     public record FilterResponseDTO
     (
         string SourceId,
-        int UserId,
         string FieldName,
         string Data
     );

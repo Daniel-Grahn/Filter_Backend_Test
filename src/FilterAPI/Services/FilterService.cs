@@ -17,31 +17,41 @@ namespace FilterAPI.Services
         }
 
         public Task<Filter[]> GetFiltersAsync(string sourceId, int userId) => _repo.GetFiltersAsync(sourceId, userId);
-        public async Task<IResult> AddOrUpdateFilterAsync(FilterRequestDTO requestFilter)
+        public async Task<IResult> AddOrUpdateFilterAsync(Filter filter)
         {
-            //mapp requets to filter
-            var inputFilter = _mapper.Map<Filter>(requestFilter);
-            var existing = await _repo.GetFilterByFieldNameAsync(inputFilter.SourceId, inputFilter.UserId, inputFilter.FieldName);
+            var existing = await _repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
             if (existing == null)
             {
-                await _repo.AddFilterAsync(inputFilter);
-                return TypedResults.Ok();
+                await _repo.AddFilterAsync(filter);
+                return TypedResults.NoContent();
             }
 
-            existing.Data = inputFilter.Data;
+            existing.Data = filter.Data;
             await _repo.UpdateFilterAsync(existing);
-            return TypedResults.Ok();
+            return TypedResults.NoContent();
+        }
+
+        public async Task<IResult> ClearUserFiltersBySource(string sourceId, int userId)
+        {
+            var filterList = await _repo.GetFiltersAsync(sourceId, userId);
+
+            foreach (var filter in filterList)
+            {
+                await _repo.DeleteFilterAsync(filter);
+            }
+
+            return TypedResults.NoContent();
         }
 
         public Task<StoredFilter[]> GetStoredFiltersAsync() => _repo.GetStoredFiltersAsync();
-        public async Task<IResult> AddOrUpdateStoredFilterAsync(int id, StoredFilterRequestDTO sf)
+        public async Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf)
         {
-            var existing = await _repo.GetStoredFilterAsync(id);
+            var existing = await _repo.GetStoredFilterAsync(sf.Id);
             if (existing == null)
             {
-                var storedFilter = _mapper.Map<StoredFilter>(sf);
-                await _repo.AddStoredFilterAsync(storedFilter);
-                return TypedResults.Ok();
+                sf.Id = 0;
+                await _repo.AddStoredFilterAsync(sf);
+                return TypedResults.NoContent();
             }
             else
             {
@@ -65,19 +75,6 @@ namespace FilterAPI.Services
             }
         }
         public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
-
-        public async Task<IResult> ClearDataInFilters(string sourceId, int userId)
-        {
-            var filterList = await _repo.GetFiltersAsync(sourceId, userId);
-
-            foreach (var filter in filterList)
-            {
-                filter.Data = [];
-                await _repo.UpdateFilterAsync(filter);
-            }
-            
-            return TypedResults.Ok();
-        }
 
     }
 }

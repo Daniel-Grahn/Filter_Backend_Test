@@ -6,11 +6,11 @@ namespace FilterAPI.Services
     public interface IFilterService
     {
         Task<Filter[]> GetFiltersAsync(string sourceId, int userId);
-        Task<IResult> AddOrUpdateFilterAsync(FilterRequestDTO filter);
+        Task<IResult> AddOrUpdateFilterAsync(Filter filter);
+        Task<IResult> ClearUserFiltersBySource(string sourceId, int userId);
         Task<StoredFilter[]> GetStoredFiltersAsync();
-        Task<IResult> AddOrUpdateStoredFilterAsync(int id, StoredFilterRequestDTO sf);
+        Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf);
         Task<IResult> DeleteStoredFilterAsync(int id);
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
-        Task<IResult> ClearDataInFilters(string sourceId, int userId);
     }
 }

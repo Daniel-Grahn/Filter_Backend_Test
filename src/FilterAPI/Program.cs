@@ -5,6 +5,8 @@ using FilterAPI.Models;
 using FilterAPI.Repositories;
 using FilterAPI.Repository;
 using FilterAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,9 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.CreateMap<FilterRequestDTO, Filter>();
+    cfg.CreateMap<FilterRequestDTO, Filter>().ForMember(dest => dest.UserId, opt => opt.Ignore());
+
     cfg.CreateMap<Filter, FilterResponseDTO>();
-    cfg.CreateMap<StoredFilterRequestDTO, StoredFilter>();
+    cfg.CreateMap<StoredFilterRequestDTO, StoredFilter>().ForMember(dest => dest.CompanyId, opt => opt.Ignore()).ForMember(dest => dest.UserId, opt => opt.Ignore());
     cfg.CreateMap<StoredFilter, StoredFilterResponseDTO>();
     cfg.CreateMap<FilterCompositionRequestDTO, FilterComposition>();
     cfg.CreateMap<FilterComposition, FilterCompositionResponseDTO>();
@@ -27,6 +30,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Filter API", Description = ".", Version = "v1" });
+    // Add JWT Bearer token support
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 //builder.Services.AddCors(options =>
@@ -46,24 +72,37 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
     {
         ValidIssuer = "tojSystem",
         ValidAudience = "filter-api",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super-secret-shared-key")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super-secret-shared-key-super-secret-shared-key")),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256, SecurityAlgorithms.Sha256Digest },
-        SignatureValidator = (token, parameters) =>
+        ClockSkew = TimeSpan.FromMinutes(5),
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
         {
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-            return jwt;
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Console.WriteLine($"Challenge: {context.Error} - {context.ErrorDescription}");
+            return Task.CompletedTask;
         }
     };
 });
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddDbContext<FilterDb>(options => 
+builder.Services.AddDbContext<FilterDb>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
