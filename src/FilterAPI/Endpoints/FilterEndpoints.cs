@@ -45,6 +45,14 @@ namespace FilterAPI.Endpoints
                 return result;
             }).RequireAuthorization();
 
+            filterGroup.MapDelete("/page/{sourceId}/clear", async (string sourceId, IFilterService service, ClaimsPrincipal claims) =>
+            {
+                var claimValues = ClaimConverterHelper.FindValues(claims);
+                var results = await service.ClearUserFiltersBySource(sourceId, claimValues.GetValueOrDefault("userId"));
+                return results;
+            }).RequireAuthorization();
+
+            //StoredFilterRequestDTO
             filterGroup.MapGet("/getstoredfilters", async (IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var results = await service.GetStoredFiltersAsync();
@@ -60,7 +68,6 @@ namespace FilterAPI.Endpoints
                 return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
             }).RequireAuthorization();
 
-            //StoredFilterRequestDTO
             filterGroup.MapPut("/addstoredfilter", async (StoredFilterRequestDTO sf, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 StoredFilter inputSf = mapper.Map<StoredFilter>(sf);
@@ -95,12 +102,6 @@ namespace FilterAPI.Endpoints
                 return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
             }).RequireAuthorization();
             
-            filterGroup.MapDelete("/page/{sourceId}/clear", async (string sourceId, IFilterService service, ClaimsPrincipal claims) =>
-            {
-                var claimValues = ClaimConverterHelper.FindValues(claims);
-                var results = await service.ClearUserFiltersBySource(sourceId, claimValues.GetValueOrDefault("userId"));
-                return results;
-            }).RequireAuthorization();
 
 
 

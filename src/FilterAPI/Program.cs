@@ -55,16 +55,23 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowToj", policy =>
-//    {
-//        policy.WithOrigins("toj.informer.se")
-//        .AllowAnyHeader()
-//        .AllowAnyMethod()
-//        .AllowCredentials();
-//    });
-//});
+builder.Services.AddCors(options =>
+{
+    //options.AddPolicy("AllowToj", policy =>
+    //{
+    //    policy.WithOrigins("toj.informer.se")
+    //    .AllowAnyHeader()
+    //    .AllowAnyMethod()
+    //    .AllowCredentials();
+    //});
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
 
 builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
 {
@@ -111,6 +118,7 @@ builder.Services.AddScoped<IFilterService, FilterService>();
 
 var app = builder.Build();
 //app.UseCors("AllowToj");
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

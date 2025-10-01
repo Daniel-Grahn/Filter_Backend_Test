@@ -4,6 +4,6 @@
     (
         string SourceId,
         string FieldName,
-        string Data
+        string[] Data
     );
 }
