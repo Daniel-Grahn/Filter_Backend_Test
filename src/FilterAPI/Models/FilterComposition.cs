@@ -1,4 +1,6 @@
-﻿namespace FilterAPI.Models
+﻿using FilterAPI.Data;
+
+namespace FilterAPI.Models
 {
     public class FilterComposition
     {
@@ -10,5 +12,23 @@
         public required DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public string[]? FieldNames { get; set; }
+
+        public void Update(FilterComposition request)
+        {
+            if (request == null) return;
+            bool isUpdated = false;
+
+
+            if (FieldNames != request.FieldNames)
+            {
+                FieldNames = request.FieldNames;
+                isUpdated = true;
+            }
+
+            if (isUpdated)
+            {
+                UpdatedAt = DateTime.UtcNow;
+            }
+        }
     }
 }

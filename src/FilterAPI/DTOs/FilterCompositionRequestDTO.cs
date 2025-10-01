@@ -3,8 +3,8 @@
     public record FilterCompositionRequestDTO
     (
         int Id,
+        string Title,
         string SourceId,
-        string CompositionName,
-        string Description
+        string[] FieldNames
      );
 }

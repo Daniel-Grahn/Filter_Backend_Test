@@ -52,7 +52,7 @@ namespace FilterAPI.Endpoints
                 return results;
             }).RequireAuthorization();
 
-            //StoredFilterRequestDTO
+            
             filterGroup.MapGet("/getstoredfilters", async (IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var results = await service.GetStoredFiltersAsync();
@@ -101,9 +101,15 @@ namespace FilterAPI.Endpoints
 
                 return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
             }).RequireAuthorization();
-            
 
+            //--------------Test-------------------------
+            filterGroup.MapPut("/updatecomposition/", async (FilterCompositionRequestDTO fc, IFilterService service, IMapper mapper) =>
+            {
+                FilterComposition inputFilterComp = mapper.Map<FilterComposition>(fc);
 
+                var results = await service.UpdateFilterCompositionAsync(inputFilterComp);
+                return Results.Ok(results);
+            }).RequireAuthorization();
 
 
 
