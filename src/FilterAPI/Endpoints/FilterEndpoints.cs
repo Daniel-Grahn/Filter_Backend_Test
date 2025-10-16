@@ -18,7 +18,7 @@ namespace FilterAPI.Endpoints
             ///<summary>
             ///
             ///</summary>
-            filterGroup.MapGet("/page/{sourceId}/", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapGet("/page/{sourceId}", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
                 var results = await service.GetFiltersAsync(sourceId, claimValues.GetValueOrDefault("userId"));
@@ -35,7 +35,7 @@ namespace FilterAPI.Endpoints
             }).RequireAuthorization();
 
             //FilterRequestDTO
-            filterGroup.MapPut("/", async (FilterRequestDTO filter, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapPut("", async (FilterRequestDTO filter, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
                 Filter inputFilter = mapper.Map<Filter>(filter);
@@ -86,7 +86,7 @@ namespace FilterAPI.Endpoints
                 return result;
             }).RequireAuthorization();
 
-            filterGroup.MapGet("/page/{sourceId}/getcomposition/", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapGet("/page/{sourceId}/getcomposition", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
                 var results = await service.GetFilterCompositionsAsync(claimValues.GetValueOrDefault("companyId"), sourceId);
@@ -103,7 +103,7 @@ namespace FilterAPI.Endpoints
             }).RequireAuthorization();
 
             //--------------Test-------------------------
-            filterGroup.MapPut("/updatecomposition/", async (FilterCompositionRequestDTO fc, IFilterService service, IMapper mapper) =>
+            filterGroup.MapPut("/updatecomposition", async (FilterCompositionRequestDTO fc, IFilterService service, IMapper mapper) =>
             {
                 FilterComposition inputFilterComp = mapper.Map<FilterComposition>(fc);
 
