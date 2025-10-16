@@ -31,6 +31,25 @@ namespace FilterAPI.Services
             return TypedResults.NoContent();
         }
 
+        public async Task<IResult> BulkUpdateFilterAsync(IEnumerable<Filter> inputFilters)
+        {
+            foreach (var filter in inputFilters)
+            {
+                var existing = await _repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
+                if (existing == null)
+                {
+                    await _repo.AddFilterAsync(filter);
+                }
+                else
+                {
+                    existing.Data = filter.Data;
+                    await _repo.UpdateFilterAsync(existing);
+                }
+            }
+
+            return TypedResults.NoContent();
+        }
+
         public async Task<IResult> ClearUserFiltersBySource(string sourceId, int userId)
         {
             var filterList = await _repo.GetFiltersAsync(sourceId, userId);
@@ -78,8 +97,8 @@ namespace FilterAPI.Services
 
         public async Task<IResult> UpdateFilterCompositionAsync(FilterComposition fc)
         {
-            var existing = await _repo.GetFilterCompositionAsync(fc.Id); 
-            if(existing != null)
+            var existing = await _repo.GetFilterCompositionAsync(fc.Id);
+            if (existing != null)
             {
                 existing.Update(fc);
                 await _repo.UpdateFilterCompositionAsync(existing);
@@ -88,7 +107,7 @@ namespace FilterAPI.Services
             else
             {
                 return TypedResults.NotFound();
-            }            
+            }
         }
     }
 }

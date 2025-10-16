@@ -45,6 +45,20 @@ namespace FilterAPI.Endpoints
                 return result;
             }).RequireAuthorization();
 
+            filterGroup.MapPut("/bulksave", async (FilterRequestDTO[] filters, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            {
+                var claimValues = ClaimConverterHelper.FindValues(claims);
+                List<Filter> inputFilters = new();
+                foreach (var filter in filters)
+                {
+                    inputFilters.Add(mapper.Map<Filter>(filter));
+                    inputFilters.Last().UserId = claimValues.GetValueOrDefault("userId");
+                }
+
+                var result = await service.BulkUpdateFilterAsync(inputFilters);
+                return result;
+            }).RequireAuthorization();
+
             filterGroup.MapDelete("/page/{sourceId}/clear", async (string sourceId, IFilterService service, ClaimsPrincipal claims) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
