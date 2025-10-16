@@ -33,6 +33,9 @@ namespace FilterAPI.Services
 
         public async Task<IResult> BulkUpdateFilterAsync(IEnumerable<Filter> inputFilters)
         {
+            var firstFilter = inputFilters.First();
+            var existingFilters = await _repo.GetFiltersAsync(firstFilter.SourceId, firstFilter.UserId);
+            var listOfFilters = existingFilters.ToList();
             foreach (var filter in inputFilters)
             {
                 var existing = await _repo.GetFilterByFieldNameAsync(filter.SourceId, filter.UserId, filter.FieldName);
@@ -42,9 +45,15 @@ namespace FilterAPI.Services
                 }
                 else
                 {
+                    listOfFilters.Remove(existing);
                     existing.Data = filter.Data;
                     await _repo.UpdateFilterAsync(existing);
                 }
+            }
+
+            foreach (var filter in listOfFilters)
+            {
+                await _repo.DeleteFilterAsync(filter);
             }
 
             return TypedResults.NoContent();

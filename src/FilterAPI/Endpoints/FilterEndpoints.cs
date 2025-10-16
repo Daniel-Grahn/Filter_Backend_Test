@@ -3,6 +3,7 @@ using FilterAPI.DTOs;
 using FilterAPI.Helpers;
 using FilterAPI.Models;
 using FilterAPI.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -45,7 +46,7 @@ namespace FilterAPI.Endpoints
                 return result;
             }).RequireAuthorization();
 
-            filterGroup.MapPut("/bulksave", async (FilterRequestDTO[] filters, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapPut("/bulksave", async ([FromBody] FilterRequestDTO[] filters, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
                 List<Filter> inputFilters = new();
