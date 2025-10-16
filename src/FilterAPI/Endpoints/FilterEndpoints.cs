@@ -31,7 +31,7 @@ namespace FilterAPI.Endpoints
 
                 var responseArray = response.ToArray();
 
-                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
+                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NoContent();
             }).RequireAuthorization();
 
             //FilterRequestDTO
@@ -65,7 +65,7 @@ namespace FilterAPI.Endpoints
 
                 var responseArray = response.ToArray();
 
-                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
+                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NoContent();
             }).RequireAuthorization();
 
             filterGroup.MapPut("/addstoredfilter", async (StoredFilterRequestDTO sf, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
@@ -99,7 +99,7 @@ namespace FilterAPI.Endpoints
 
                 var responseArray = response.ToArray();
 
-                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NotFound();
+                return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NoContent();
             }).RequireAuthorization();
 
             //--------------Test-------------------------
@@ -110,54 +110,7 @@ namespace FilterAPI.Endpoints
                 var results = await service.UpdateFilterCompositionAsync(inputFilterComp);
                 return Results.Ok(results);
             }).RequireAuthorization();
-
-
-
-            // ----------- TEST FUNCTIONS ----------------
-            filterGroup.MapGet("/whoami", (HttpContext context) =>
-            {
-                var user = context.User;
-                return user.Identity?.IsAuthenticated == true
-                    ? Results.Ok(new
-                    {
-                        Name = user.Identity.Name,
-                        Claims = user.Claims.Select(c => new { c.Type, c.Value })
-                    })
-                    : Results.Unauthorized();
-            }).RequireAuthorization(); 
-
-            filterGroup.MapGet("/debug-token", (HttpContext context) =>
-            {
-                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-                if (authHeader?.StartsWith("Bearer ") == true)
-                {
-                    var token = authHeader.Substring("Bearer ".Length).Trim();
-                    var handler = new JwtSecurityTokenHandler();
-
-                    try
-                    {
-                        var jwtToken = handler.ReadJwtToken(token);
-                        return Results.Ok(new
-                        {
-                            claims = jwtToken.Claims.Select(c => new { c.Type, c.Value }),
-                            issuer = jwtToken.Issuer,
-                            audience = jwtToken.Audiences,
-                            validTo = jwtToken.ValidTo,
-                            signatureAlgorithm = jwtToken.SignatureAlgorithm
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        return Results.BadRequest($"Token parsing failed: {ex.Message}");
-                    }
-                }
-                return Results.BadRequest("No token provided");
-            }).AllowAnonymous();
-
-
-        }
-
-        
+        }       
     }
 }
 
