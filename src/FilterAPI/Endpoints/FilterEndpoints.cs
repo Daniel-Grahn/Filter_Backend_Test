@@ -117,6 +117,22 @@ namespace FilterAPI.Endpoints
                 return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NoContent();
             }).RequireAuthorization();
 
+            filterGroup.MapPut("/page/{sourceId}/putdate", async (string sourceId, DateRangeRequestDTO dr, IFilterService service, IMapper mapper) =>
+            {
+                var inputRange = mapper.Map<DateRange>(dr);
+                inputRange.SourceId = sourceId;
+                var result = await service.AddOrUpdateDateRangeAsync(inputRange);
+                return result;
+            }).RequireAuthorization();
+
+            filterGroup.MapGet("/page/{sourceId}/getdate", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            {
+                var claimValues = ClaimConverterHelper.FindValues(claims);
+                var result = await service.GetDateRangeAsync(claimValues.GetValueOrDefault("userId"), sourceId);
+                var response = mapper.Map<DateRangeResponseDTO>(result);
+                return response != null ? Results.Ok(response) : Results.NoContent();
+            }).RequireAuthorization();
+
             //--------------Test-------------------------
             filterGroup.MapPut("/updatecomposition", async (FilterCompositionRequestDTO fc, IFilterService service, IMapper mapper) =>
             {

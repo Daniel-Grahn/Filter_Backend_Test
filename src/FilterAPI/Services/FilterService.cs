@@ -118,5 +118,21 @@ namespace FilterAPI.Services
                 return TypedResults.NotFound();
             }
         }
+
+        public async Task<DateRange?> GetDateRangeAsync(int userId, string sourceId) => await _repo.GetDateRangeAsync(userId, sourceId);
+        public async Task<IResult> AddOrUpdateDateRangeAsync(DateRange dr)
+        {
+            var existing = await _repo.GetDateRangeAsync(dr.UserId, dr.SourceId);
+            if (existing == null)
+            {
+                await _repo.AddDateRangeAsync(dr);
+            }
+            else
+            {
+                existing.Update(dr);
+                await _repo.UpdateDateRangeAsync(existing);
+            }
+            return TypedResults.NoContent();
+        }
     }
 }

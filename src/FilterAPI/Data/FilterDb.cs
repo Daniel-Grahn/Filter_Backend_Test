@@ -11,6 +11,7 @@ namespace FilterAPI.Data
         public DbSet<Filter> Filter { get; set; } = null!;
         public DbSet<StoredFilter> StoredFilter { get; set; } = null!;
         public DbSet<FilterComposition> FilterComposition { get; set; } = null!;
+        public DbSet<DateRange> DateRange { get; set; } = null!;
 
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +27,19 @@ namespace FilterAPI.Data
 
             modelBuilder
                 .Entity<Filter>()
+                .Property(f => f.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder
+                .Entity<DateRange>()
+                .HasKey(f => new { f.UserId, f.SourceId });
+
+            modelBuilder
+                .Entity<DateRange>()
+                .HasAlternateKey(f => f.Id);
+
+            modelBuilder
+                .Entity<DateRange>()
                 .Property(f => f.Id)
                 .ValueGeneratedOnAdd();
         }

@@ -27,6 +27,9 @@ namespace FilterAPI.Repository
         Task<FilterComposition?> GetFilterCompositionAsync(int id);
         Task UpdateFilterCompositionAsync(FilterComposition fc);
 
-
+        // DateRange
+        Task<DateRange?> GetDateRangeAsync(int userId, string sourceId);
+        Task AddDateRangeAsync(DateRange dr);
+        Task UpdateDateRangeAsync(DateRange dr);
     }
 }

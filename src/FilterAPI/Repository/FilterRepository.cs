@@ -49,8 +49,8 @@ namespace FilterAPI.Repositories
 
         public async Task UpdateStoredFilterAsync(StoredFilter sf)
         {
-            _db.StoredFilter.Update(sf);    
-            await _db.SaveChangesAsync();   
+            _db.StoredFilter.Update(sf);
+            await _db.SaveChangesAsync();
         }
 
         public async Task DeleteStoredFilterAsync(StoredFilter sf)
@@ -66,11 +66,26 @@ namespace FilterAPI.Repositories
                 .ToArrayAsync();
 
         public async Task<FilterComposition?> GetFilterCompositionAsync(int id) => await _db.FilterComposition.FindAsync(id);
-        
+
 
         public async Task UpdateFilterCompositionAsync(FilterComposition fc)
         {
             _db.FilterComposition.Update(fc);
+            await _db.SaveChangesAsync();
+        }
+
+        // DateRange methods
+        public async Task<DateRange?> GetDateRangeAsync(int userId, string sourceId) => await _db.DateRange.FindAsync(userId, sourceId);
+
+        public async Task AddDateRangeAsync(DateRange dr)
+        {
+            _db.DateRange.Add(dr);
+            await _db.SaveChangesAsync();
+        }
+        
+        public async Task UpdateDateRangeAsync(DateRange dr)
+        {
+            _db.DateRange.Update(dr);
             await _db.SaveChangesAsync();
         }
     }
