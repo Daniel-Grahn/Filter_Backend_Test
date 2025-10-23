@@ -24,7 +24,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.CreateMap<StoredFilter, StoredFilterResponseDTO>();
     cfg.CreateMap<FilterCompositionRequestDTO, FilterComposition>();
     cfg.CreateMap<FilterComposition, FilterCompositionResponseDTO>();
-    cfg.CreateMap<DateRangeRequestDTO, DateRange>().ForMember(dest => dest.SourceId, opt => opt.Ignore());
+    cfg.CreateMap<DateRangeRequestDTO, DateRange>().ForMember(dest => dest.SourceId, opt => opt.Ignore()).ForMember(dest => dest.UserId, opt => opt.Ignore());
     cfg.CreateMap<DateRange, DateRangeResponseDTO>();
 });
 
