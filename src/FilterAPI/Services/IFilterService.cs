@@ -9,7 +9,7 @@ namespace FilterAPI.Services
         Task<IResult> AddOrUpdateFilterAsync(Filter filter);
         Task<IResult> BulkUpdateFilterAsync(IEnumerable<Filter> inputFilters);
         Task<IResult> ClearUserFiltersBySource(string sourceId, int userId);
-        Task<StoredFilter[]> GetStoredFiltersAsync();
+        Task<StoredFilter[]> GetStoredFiltersAsync(string sourceId);
         Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf);
         Task<IResult> DeleteStoredFilterAsync(int id);
         Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);

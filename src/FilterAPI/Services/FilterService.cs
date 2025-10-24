@@ -71,7 +71,7 @@ namespace FilterAPI.Services
             return TypedResults.NoContent();
         }
 
-        public Task<StoredFilter[]> GetStoredFiltersAsync() => _repo.GetStoredFiltersAsync();
+        public Task<StoredFilter[]> GetStoredFiltersAsync(string sourceId) => _repo.GetStoredFiltersAsync(sourceId);
         public async Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf)
         {
             var existing = await _repo.GetStoredFilterAsync(sf.Id);

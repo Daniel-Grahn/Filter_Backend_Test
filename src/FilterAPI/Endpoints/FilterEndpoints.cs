@@ -68,9 +68,9 @@ namespace FilterAPI.Endpoints
             }).RequireAuthorization();
 
             
-            filterGroup.MapGet("/getstoredfilters", async (IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapGet("/page/{sourceId}/getstoredfilters", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
-                var results = await service.GetStoredFiltersAsync();
+                var results = await service.GetStoredFiltersAsync(sourceId);
 
                 List<StoredFilterResponseDTO> response = [];
                 foreach (var item in results)

@@ -13,7 +13,7 @@ namespace FilterAPI.Repository
         Task DeleteFilterAsync(Filter filter);
 
         // StoredFilter
-        Task<StoredFilter[]> GetStoredFiltersAsync();
+        Task<StoredFilter[]> GetStoredFiltersAsync(string sourceId);
         Task<StoredFilter?> GetStoredFilterAsync(int id);
         Task AddStoredFilterAsync(StoredFilter sf); //We do not throw an ArgumentException if we try to add two filter that are identical
 

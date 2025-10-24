@@ -2,6 +2,7 @@
 using FilterAPI.Models;
 using FilterAPI.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 namespace FilterAPI.Repositories
 {
@@ -35,8 +36,10 @@ namespace FilterAPI.Repositories
 
         // StoredFilter methods
         // Will eventually get all filters based on source and user
-        public async Task<StoredFilter[]> GetStoredFiltersAsync() =>
-            await _db.StoredFilter.ToArrayAsync();
+        public async Task<StoredFilter[]> GetStoredFiltersAsync(string sourceId)
+        {
+            return await _db.StoredFilter.Where(sf => sf.SourceId == sourceId).ToArrayAsync();
+        }
 
         public async Task<StoredFilter?> GetStoredFilterAsync(int id) =>
             await _db.StoredFilter.FindAsync(id);
