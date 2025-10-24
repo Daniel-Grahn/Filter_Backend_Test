@@ -71,9 +71,15 @@ namespace FilterAPI.Repositories
         public async Task<FilterPosition?> GetFilterPositionAsync(int id) => await _db.FilterPosition.FindAsync(id);
 
 
-        public async Task UpdateFilterPositionAsync(FilterPosition fc)
+        public async Task UpdateFilterPositionAsync(FilterPosition fp)
         {
-            _db.FilterPosition.Update(fc);
+            _db.FilterPosition.Update(fp);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task AddFilterPositionAsync(FilterPosition fp)
+        {
+            _db.FilterPosition.Add(fp);
             await _db.SaveChangesAsync();
         }
 

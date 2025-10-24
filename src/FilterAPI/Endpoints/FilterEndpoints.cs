@@ -117,6 +117,16 @@ namespace FilterAPI.Endpoints
                 return responseArray.Length > 0 ? Results.Ok(responseArray) : Results.NoContent();
             }).RequireAuthorization();
 
+            filterGroup.MapPut("/updateposition", async (FilterPositionRequestDTO fp, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            {
+                var claimValues = ClaimConverterHelper.FindValues(claims);
+                FilterPosition inputFilterPosition = mapper.Map<FilterPosition>(fp);
+                inputFilterPosition.CompanyId = claimValues.GetValueOrDefault("companyId");
+
+                var results = await service.UpdateFilterPositionAsync(inputFilterPosition);
+                return Results.Ok(results);
+            }).RequireAuthorization();
+
             filterGroup.MapPut("/page/{sourceId}/putdate", async (string sourceId, DateRangeRequestDTO dr, ClaimsPrincipal claims, IFilterService service, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
@@ -135,14 +145,6 @@ namespace FilterAPI.Endpoints
                 return response != null ? Results.Ok(response) : Results.NoContent();
             }).RequireAuthorization();
 
-            //--------------Test-------------------------
-            filterGroup.MapPut("/updateposition", async (FilterPositionRequestDTO fc, IFilterService service, IMapper mapper) =>
-            {
-                FilterPosition inputFilterComp = mapper.Map<FilterPosition>(fc);
-
-                var results = await service.UpdateFilterPositionAsync(inputFilterComp);
-                return Results.Ok(results);
-            }).RequireAuthorization();
         }       
     }
 }

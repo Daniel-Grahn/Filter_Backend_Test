@@ -13,7 +13,7 @@ namespace FilterAPI.Services
         Task<IResult> AddOrUpdateStoredFilterAsync(StoredFilter sf);
         Task<IResult> DeleteStoredFilterAsync(int id);
         Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId);
-        Task<IResult> UpdateFilterPositionAsync(FilterPosition fc);
+        Task<IResult> UpdateFilterPositionAsync(FilterPosition fp);
         Task<DateRange?> GetDateRangeAsync(int userId, string sourceId);
         Task<IResult> AddOrUpdateDateRangeAsync(DateRange dr);
     }

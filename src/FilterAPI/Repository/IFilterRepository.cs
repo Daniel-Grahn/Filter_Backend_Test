@@ -25,7 +25,9 @@ namespace FilterAPI.Repository
         Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId);
 
         Task<FilterPosition?> GetFilterPositionAsync(int id);
-        Task UpdateFilterPositionAsync(FilterPosition fc);
+        Task UpdateFilterPositionAsync(FilterPosition fp);
+
+        Task AddFilterPositionAsync(FilterPosition fp);
 
         // DateRange
         Task<DateRange?> GetDateRangeAsync(int userId, string sourceId);

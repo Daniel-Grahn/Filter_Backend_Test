@@ -104,19 +104,19 @@ namespace FilterAPI.Services
         }
         public Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId) => _repo.GetFilterPositionsAsync(companyId, sourceId);
 
-        public async Task<IResult> UpdateFilterPositionAsync(FilterPosition fc)
+        public async Task<IResult> UpdateFilterPositionAsync(FilterPosition fp)
         {
-            var existing = await _repo.GetFilterPositionAsync(fc.Id);
+            var existing = await _repo.GetFilterPositionAsync(fp.Id);
             if (existing != null)
             {
-                existing.Update(fc);
+                existing.Update(fp);
                 await _repo.UpdateFilterPositionAsync(existing);
-                return TypedResults.NoContent();
             }
             else
             {
-                return TypedResults.NotFound();
+                await _repo.AddFilterPositionAsync(fp);
             }
+                return TypedResults.NoContent();
         }
 
         public async Task<DateRange?> GetDateRangeAsync(int userId, string sourceId) => await _repo.GetDateRangeAsync(userId, sourceId);
