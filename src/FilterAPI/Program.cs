@@ -6,11 +6,9 @@ using FilterAPI.Repositories;
 using FilterAPI.Repository;
 using FilterAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,8 +20,8 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.CreateMap<Filter, FilterResponseDTO>();
     cfg.CreateMap<StoredFilterRequestDTO, StoredFilter>().ForMember(dest => dest.CompanyId, opt => opt.Ignore()).ForMember(dest => dest.UserId, opt => opt.Ignore());
     cfg.CreateMap<StoredFilter, StoredFilterResponseDTO>();
-    cfg.CreateMap<FilterCompositionRequestDTO, FilterComposition>();
-    cfg.CreateMap<FilterComposition, FilterCompositionResponseDTO>();
+    cfg.CreateMap<FilterPositionRequestDTO, FilterPosition>();
+    cfg.CreateMap<FilterPosition, FilterPositionResponseDTO>();
     cfg.CreateMap<DateRangeRequestDTO, DateRange>().ForMember(dest => dest.SourceId, opt => opt.Ignore()).ForMember(dest => dest.UserId, opt => opt.Ignore());
     cfg.CreateMap<DateRange, DateRangeResponseDTO>();
 });

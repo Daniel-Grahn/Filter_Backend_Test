@@ -102,15 +102,15 @@ namespace FilterAPI.Services
                 return TypedResults.NoContent();
             }
         }
-        public Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) => _repo.GetFilterCompositionsAsync(companyId, sourceId);
+        public Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId) => _repo.GetFilterPositionsAsync(companyId, sourceId);
 
-        public async Task<IResult> UpdateFilterCompositionAsync(FilterComposition fc)
+        public async Task<IResult> UpdateFilterPositionAsync(FilterPosition fc)
         {
-            var existing = await _repo.GetFilterCompositionAsync(fc.Id);
+            var existing = await _repo.GetFilterPositionAsync(fc.Id);
             if (existing != null)
             {
                 existing.Update(fc);
-                await _repo.UpdateFilterCompositionAsync(existing);
+                await _repo.UpdateFilterPositionAsync(existing);
                 return TypedResults.NoContent();
             }
             else

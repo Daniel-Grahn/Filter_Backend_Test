@@ -63,17 +63,17 @@ namespace FilterAPI.Repositories
         }
 
         // FilterComposition methods
-        public async Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId) =>
-            await _db.FilterComposition
+        public async Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId) =>
+            await _db.FilterPosition
                 .Where(fc => fc.CompanyId == companyId && fc.SourceId == sourceId)
                 .ToArrayAsync();
 
-        public async Task<FilterComposition?> GetFilterCompositionAsync(int id) => await _db.FilterComposition.FindAsync(id);
+        public async Task<FilterPosition?> GetFilterPositionAsync(int id) => await _db.FilterPosition.FindAsync(id);
 
 
-        public async Task UpdateFilterCompositionAsync(FilterComposition fc)
+        public async Task UpdateFilterPositionAsync(FilterPosition fc)
         {
-            _db.FilterComposition.Update(fc);
+            _db.FilterPosition.Update(fc);
             await _db.SaveChangesAsync();
         }
 

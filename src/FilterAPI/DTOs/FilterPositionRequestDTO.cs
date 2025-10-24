@@ -1,6 +1,6 @@
 ﻿namespace FilterAPI.DTOs
 {
-    public record FilterCompositionRequestDTO
+    public record FilterPositionRequestDTO
     (
         int Id,
         string Title,

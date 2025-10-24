@@ -10,7 +10,7 @@ namespace FilterAPI.Data
         //public DbSet<Filter> Filters => Set<Filter>();
         public DbSet<Filter> Filter { get; set; } = null!;
         public DbSet<StoredFilter> StoredFilter { get; set; } = null!;
-        public DbSet<FilterComposition> FilterComposition { get; set; } = null!;
+        public DbSet<FilterPosition> FilterPosition { get; set; } = null!;
         public DbSet<DateRange> DateRange { get; set; } = null!;
 
         

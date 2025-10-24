@@ -101,15 +101,15 @@ namespace FilterAPI.Endpoints
                 return result;
             }).RequireAuthorization();
 
-            filterGroup.MapGet("/page/{sourceId}/getcomposition", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
+            filterGroup.MapGet("/page/{sourceId}/getposition", async (string sourceId, IFilterService service, ClaimsPrincipal claims, IMapper mapper) =>
             {
                 var claimValues = ClaimConverterHelper.FindValues(claims);
-                var results = await service.GetFilterCompositionsAsync(claimValues.GetValueOrDefault("companyId"), sourceId);
+                var results = await service.GetFilterPositionsAsync(claimValues.GetValueOrDefault("companyId"), sourceId);
 
-                List<FilterCompositionResponseDTO> response = [];
+                List<FilterPositionResponseDTO> response = [];
                 foreach (var item in results)
                 {
-                    response.Add(mapper.Map<FilterCompositionResponseDTO>(item));                   
+                    response.Add(mapper.Map<FilterPositionResponseDTO>(item));                   
                 }
 
                 var responseArray = response.ToArray();
@@ -136,11 +136,11 @@ namespace FilterAPI.Endpoints
             }).RequireAuthorization();
 
             //--------------Test-------------------------
-            filterGroup.MapPut("/updatecomposition", async (FilterCompositionRequestDTO fc, IFilterService service, IMapper mapper) =>
+            filterGroup.MapPut("/updateposition", async (FilterPositionRequestDTO fc, IFilterService service, IMapper mapper) =>
             {
-                FilterComposition inputFilterComp = mapper.Map<FilterComposition>(fc);
+                FilterPosition inputFilterComp = mapper.Map<FilterPosition>(fc);
 
-                var results = await service.UpdateFilterCompositionAsync(inputFilterComp);
+                var results = await service.UpdateFilterPositionAsync(inputFilterComp);
                 return Results.Ok(results);
             }).RequireAuthorization();
         }       

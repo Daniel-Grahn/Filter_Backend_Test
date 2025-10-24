@@ -183,7 +183,7 @@ namespace FilterAPI.Integration.Tests.Repositories
         {
             var db = GetDbContext();
             var repo = new FilterRepository(db);
-            StoredFilter[] storedFilters = await repo.GetStoredFiltersAsync();
+            StoredFilter[] storedFilters = await repo.GetStoredFiltersAsync("1");
             Assert.Empty(storedFilters);
 
 
@@ -198,7 +198,7 @@ namespace FilterAPI.Integration.Tests.Repositories
                 CreatedAt = DateTime.Now,
             };
             await repo.AddStoredFilterAsync(newStoredFilter);
-            storedFilters = await repo.GetStoredFiltersAsync();
+            storedFilters = await repo.GetStoredFiltersAsync(newStoredFilter.SourceId);
 
             Assert.Single(storedFilters);
             Assert.Equal("myFilter", storedFilters[0].Title);
@@ -216,7 +216,7 @@ namespace FilterAPI.Integration.Tests.Repositories
             };
 
             await repo.AddStoredFilterAsync(aSecondStoredFilter);
-            storedFilters = await repo.GetStoredFiltersAsync();
+            storedFilters = await repo.GetStoredFiltersAsync(aSecondStoredFilter.SourceId);
             Assert.Equal(2, storedFilters.Length);
         }
 
@@ -266,12 +266,12 @@ namespace FilterAPI.Integration.Tests.Repositories
                 CreatedAt = DateTime.Now,
             };
 
-            StoredFilter[] getNoStoredFilter = await repo.GetStoredFiltersAsync();
+            StoredFilter[] getNoStoredFilter = await repo.GetStoredFiltersAsync(newStoredFilter.SourceId);
             Assert.Empty(getNoStoredFilter);
 
             //check if there is only one
             await repo.AddStoredFilterAsync(newStoredFilter);
-            StoredFilter[] storedFilter = await repo.GetStoredFiltersAsync();
+            StoredFilter[] storedFilter = await repo.GetStoredFiltersAsync(newStoredFilter.SourceId);
             //Assert.NotEmpty(storedFilter);
             Assert.Single(storedFilter);
 
@@ -282,7 +282,7 @@ namespace FilterAPI.Integration.Tests.Repositories
             //    await repo.AddStoredFilterAsync(newStoredFilter);
             //});
 
-            StoredFilter[] findstoredFilter = await repo.GetStoredFiltersAsync();
+            StoredFilter[] findstoredFilter = await repo.GetStoredFiltersAsync("1");
             Assert.NotEmpty(findstoredFilter);
             Assert.Single(findstoredFilter);
 
@@ -297,7 +297,7 @@ namespace FilterAPI.Integration.Tests.Repositories
                 CreatedAt = DateTime.Now,
             };
             await repo.AddStoredFilterAsync(secondStoredFilter);
-            StoredFilter[] foundStoredFilters = await repo.GetStoredFiltersAsync();
+            StoredFilter[] foundStoredFilters = await repo.GetStoredFiltersAsync(secondStoredFilter.SourceId);
             Assert.Equal(2, foundStoredFilters.Length);
         }
 
@@ -350,7 +350,7 @@ namespace FilterAPI.Integration.Tests.Repositories
                 await repo.AddStoredFilterAsync(sf);
             }
 
-            StoredFilter[] allStoredFilter = await repo.GetStoredFiltersAsync();
+            StoredFilter[] allStoredFilter = await repo.GetStoredFiltersAsync("1");
             Assert.Equal(3, allStoredFilter.Length);
 
             StoredFilter? laststoredFilter = await repo.GetStoredFilterAsync(3);
@@ -359,19 +359,19 @@ namespace FilterAPI.Integration.Tests.Repositories
             Assert.Equal("bar", laststoredFilter.Title);
             await repo.DeleteStoredFilterAsync(laststoredFilter);
 
-            allStoredFilter = await repo.GetStoredFiltersAsync();
+            allStoredFilter = await repo.GetStoredFiltersAsync("1");
             Assert.Equal(2, allStoredFilter.Length);
         }
 
         // FilterComposition
         [Fact]
-        public async Task GetFilterCompositionsAsync()
+        public async Task GetFilterPositionsAsync()
         {
             var db = GetDbContext();
             var repo = new FilterRepository(db);
 
-            FilterComposition[] filterCompositionList = await repo.GetFilterCompositionsAsync(22, "1");
-            Assert.Empty(filterCompositionList);
+            FilterPosition[] filterPositionList = await repo.GetFilterPositionsAsync(22, "1");
+            Assert.Empty(filterPositionList);
 
             // There is no way to test this properly
             // there is no add/get/update method for Filter Composition

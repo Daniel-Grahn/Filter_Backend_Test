@@ -2,7 +2,7 @@
 
 namespace FilterAPI.Models
 {
-    public class FilterComposition
+    public class FilterPosition
     {
         public int Id { get; set; }
         public required string Title { get; set; }
@@ -13,7 +13,7 @@ namespace FilterAPI.Models
         public DateTime? UpdatedAt { get; set; }
         public string[]? FieldNames { get; set; }
 
-        public void Update(FilterComposition request)
+        public void Update(FilterPosition request)
         {
             if (request == null) return;
             bool isUpdated = false;

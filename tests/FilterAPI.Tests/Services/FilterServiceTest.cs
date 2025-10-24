@@ -172,7 +172,7 @@ namespace FilterAPI.Integration.Tests.Services
         public async Task GetStoredFiltersAsync_Empty()
         {
             var (filterService, _) = GetServices();
-            var StoredFilters = await filterService.GetStoredFiltersAsync();
+            var StoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Empty(StoredFilters);
         }
 
@@ -180,14 +180,14 @@ namespace FilterAPI.Integration.Tests.Services
         public async Task GetStoredFiltersAsync_Find()
         {
             var (filterService, _) = GetServices();
-            var storedFilters = await filterService.GetStoredFiltersAsync();
+            var storedFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Empty(storedFilters);
 
-            StoredFilter storedFileter = new() { Title = "foo", CreatedAt = DateTime.UtcNow, CompanyId = 22, UserId = 1, SourceId = "1" }; //Title could be null but is not allowed in DB
+            StoredFilter storedFilter = new() { Title = "foo", CreatedAt = DateTime.UtcNow, CompanyId = 22, UserId = 1, SourceId = "1" }; //Title could be null but is not allowed in DB
 
-            await filterService.AddOrUpdateStoredFilterAsync(storedFileter);
+            await filterService.AddOrUpdateStoredFilterAsync(storedFilter);
 
-            storedFilters = await filterService.GetStoredFiltersAsync();
+            storedFilters = await filterService.GetStoredFiltersAsync(storedFilter.SourceId);
             Assert.Single(storedFilters);
 
             var theStoredFilter = storedFilters[0];
@@ -200,44 +200,17 @@ namespace FilterAPI.Integration.Tests.Services
         public async Task AddOrUpdateStoredFilterAsync_AddSimple()
         {
             var (filterService, _) = GetServices();
-            var nostoredFilters = await filterService.GetStoredFiltersAsync();
+            var nostoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Empty(nostoredFilters);
 
             StoredFilter storedFilter = new() { Title = "foo", CreatedAt = DateTime.UtcNow, SourceId = "1" };
             await filterService.AddOrUpdateStoredFilterAsync(storedFilter);
 
-            var allStoredFilters = await filterService.GetStoredFiltersAsync();
+            var allStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Single(allStoredFilters);
 
             var theStoredFilter = allStoredFilters[0];
             Assert.Equal("foo", theStoredFilter.Title);
-            Assert.Equal("1", theStoredFilter.SourceId);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateStoredFilterAsync_AddMultple()
-        {
-            var (filterService, _) = GetServices();
-            var nostoredFilters = await filterService.GetStoredFiltersAsync();
-            Assert.Empty(nostoredFilters);
-
-            StoredFilter[] storedFilters = [
-                new() { Title="foo", CreatedAt = DateTime.UtcNow, CompanyId = 21, UserId=1, SourceId="1"},
-                new() { Title="bar", CreatedAt = DateTime.UtcNow, CompanyId = 22, UserId=1, SourceId="3"},
-                new() { Title="ten", CreatedAt = DateTime.UtcNow, CompanyId = 23, UserId=1, SourceId="5"}
-            ];
-
-            for (int i = 0; i < storedFilters.Length; i++)
-            {
-                await filterService.AddOrUpdateStoredFilterAsync(storedFilters[i]);
-            }
-
-            var allStoredFilters = await filterService.GetStoredFiltersAsync();
-            Assert.Equal(3, allStoredFilters.Length);
-
-            var theStoredFilter = allStoredFilters[0];
-            Assert.Equal("foo", theStoredFilter.Title);
-            Assert.Equal(21, theStoredFilter.CompanyId);
             Assert.Equal("1", theStoredFilter.SourceId);
         }
 
@@ -252,7 +225,7 @@ namespace FilterAPI.Integration.Tests.Services
             StoredFilter storedFilter = new() { Title = "foo", CreatedAt = CreatedAt, CompanyId = 21, UserId = 1, SourceId = "1", IsPersonal = true };
             await filterService.AddOrUpdateStoredFilterAsync(storedFilter);
 
-            var allStoredFilters = await filterService.GetStoredFiltersAsync();
+            var allStoredFilters = await filterService.GetStoredFiltersAsync(storedFilter.SourceId);
             Assert.Single(allStoredFilters);
 
             var theStoredFilter = allStoredFilters[0];
@@ -262,7 +235,7 @@ namespace FilterAPI.Integration.Tests.Services
             storedFilter.IsPersonal = false; 
             await filterService.AddOrUpdateStoredFilterAsync(storedFilter);
 
-            allStoredFilters = await filterService.GetStoredFiltersAsync();
+            allStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Single(allStoredFilters);
 
             theStoredFilter = allStoredFilters[0];
@@ -285,14 +258,14 @@ namespace FilterAPI.Integration.Tests.Services
                 await filterService.AddOrUpdateStoredFilterAsync(storedFilters[i]);
             }
 
-            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Equal(3, foundStoredFilters.Length);
             var lastStoredFilter = foundStoredFilters[foundStoredFilters.Length - 1];
             Assert.Equal("keke", lastStoredFilter.Title);
             Assert.Equal(23, lastStoredFilter.CompanyId);
 
             await filterService.DeleteStoredFilterAsync(lastStoredFilter.Id);
-            foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            foundStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Equal(2, foundStoredFilters.Length);
 
             lastStoredFilter = foundStoredFilters[foundStoredFilters.Length - 1];
@@ -316,12 +289,12 @@ namespace FilterAPI.Integration.Tests.Services
                 await filterService.AddOrUpdateStoredFilterAsync(storedFilters[i]);
             }
 
-            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            StoredFilter[] foundStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Equal(3, foundStoredFilters.Length);
 
 
             await filterService.DeleteStoredFilterAsync(99);
-            foundStoredFilters = await filterService.GetStoredFiltersAsync();
+            foundStoredFilters = await filterService.GetStoredFiltersAsync("1");
             Assert.Equal(3, foundStoredFilters.Length);
         }
 

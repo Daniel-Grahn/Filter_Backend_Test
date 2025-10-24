@@ -21,11 +21,11 @@ namespace FilterAPI.Repository
 
         Task DeleteStoredFilterAsync(StoredFilter sf);
 
-        // FilterComposition
-        Task<FilterComposition[]> GetFilterCompositionsAsync(int companyId, string sourceId);
+        // FilterPosition
+        Task<FilterPosition[]> GetFilterPositionsAsync(int companyId, string sourceId);
 
-        Task<FilterComposition?> GetFilterCompositionAsync(int id);
-        Task UpdateFilterCompositionAsync(FilterComposition fc);
+        Task<FilterPosition?> GetFilterPositionAsync(int id);
+        Task UpdateFilterPositionAsync(FilterPosition fc);
 
         // DateRange
         Task<DateRange?> GetDateRangeAsync(int userId, string sourceId);
